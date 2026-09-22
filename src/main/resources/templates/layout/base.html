@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en" class="dark">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout (title, content)" lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${pageTitle != null ? pageTitle + ' - Genshin Bills Tracker' : 'Genshin Bills Tracker & Recovery Vault'}">Genshin Bills Tracker</title>
+    <title th:replace="${title}">Genshin Bills Tracker</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
