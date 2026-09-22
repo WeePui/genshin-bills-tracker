@@ -141,37 +141,41 @@
     <!-- Top Navigation Bar -->
     <header class="border-b border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-[#0d1322]/85 backdrop-blur-md sticky top-0 z-40 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-16 sm:h-20">
 
                 <!-- Left: Clean Logo & Main Functionality Navigation -->
-                <div class="flex items-center space-x-4 sm:space-x-6">
-                    <!-- Clean Logo Emblem (No Text) -->
-                    <a th:href="@{/dashboard}" class="flex items-center flex-shrink-0 transition transform hover:scale-105 active:scale-95" title="Dashboard">
-                        <img th:src="@{/images/logo.png}" alt="Logo" class="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md">
+                <div class="flex items-center space-x-4 sm:space-x-8">
+                    <!-- Clean Logo (4x Enlarged, Dark Mode Inverted) -->
+                    <a th:href="@{/dashboard}" class="flex items-center flex-shrink-0 transition transform hover:scale-105 active:scale-95 py-1" title="Dashboard">
+                        <img th:src="@{/images/logo.png}" alt="Genshin Impact" class="h-10 sm:h-12 md:h-14 w-auto object-contain dark:invert drop-shadow-sm">
                     </a>
 
-                    <!-- Main Functionality Navigation Links (Dashboard, Bills, Add Bill, Recovery) -->
+                    <!-- Main Navigation Links (Dashboard, Bills, Recovery) -->
                     <nav class="hidden md:flex items-center space-x-1">
-                        <a th:href="@{/dashboard}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                        <a th:href="@{/dashboard}" class="px-3.5 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                            th:classappend="${currentNav == 'dashboard' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
                             <i class="fa-solid fa-chart-pie mr-1.5 text-xs"></i> <span th:text="#{nav.dashboard}">Dashboard</span>
                         </a>
-                        <a th:href="@{/bills}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                        <a th:href="@{/bills}" class="px-3.5 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                            th:classappend="${currentNav == 'bills' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
                             <i class="fa-solid fa-receipt mr-1.5 text-xs"></i> <span th:text="#{nav.bills}">Bills & Proofs</span>
                         </a>
-                        <a th:href="@{/bills/new}" class="px-3 py-2 rounded-lg text-sm font-medium transition bg-amber-500/15 text-amber-600 dark:text-amber-300 hover:bg-amber-500/25 border border-amber-500/30">
-                            <i class="fa-solid fa-plus-circle mr-1.5 text-xs"></i> <span th:text="#{nav.addBill}">Add / Scan Bill</span>
-                        </a>
-                        <a th:href="@{/recovery}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                        <a th:href="@{/recovery}" class="px-3.5 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
                            th:classappend="${currentNav == 'recovery' ? 'bg-slate-200 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
                             <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-emerald-500 dark:text-emerald-400"></i> <span th:text="#{nav.recovery}">Recovery</span>
                         </a>
                     </nav>
                 </div>
 
-                <!-- Right: Controls & Menu Dropdown -->
-                <div class="flex items-center space-x-2">
+                <!-- Right: Add Action Button, Controls & Menu Dropdown -->
+                <div class="flex items-center space-x-2 sm:space-x-3">
+
+                    <!-- Primary Action: + Add / Scan Bill (Moved to Right) -->
+                    <a th:href="@{/bills/new}"
+                       class="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-bold transition bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20 active:scale-95">
+                        <i class="fa-solid fa-plus sm:mr-1.5 text-xs"></i>
+                        <span class="hidden sm:inline" th:text="#{nav.addBill}">Add / Scan Bill</span>
+                    </a>
 
                     <!-- Language Switcher Pill -->
                     <div class="flex items-center border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 bg-slate-100 dark:bg-slate-900 text-xs">
