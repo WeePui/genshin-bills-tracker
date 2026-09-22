@@ -53,6 +53,63 @@
                 </div>
             </div>
 
+            <!-- Background Wallpaper Preferences -->
+            <div class="pt-4 border-t border-slate-800 space-y-4">
+                <div class="flex items-center space-x-2">
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Background Wallpaper Display</h3>
+                        <p class="text-xs text-slate-400">Choose whether the background rotates randomly between Genshin scenery artworks or stays fixed.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <label id="modeRandomLabel" class="flex items-start p-4 rounded-xl border cursor-pointer transition"
+                           th:classappend="${settings.backgroundMode == 'STATIC' ? 'border-slate-700 bg-slate-900/60' : 'border-amber-500/60 bg-amber-500/10'}">
+                        <input type="radio" th:field="${settings.backgroundMode}" value="RANDOM" class="mt-1 text-amber-500 focus:ring-amber-500" onchange="toggleBackgroundPicker(this.value)">
+                        <div class="ml-3">
+                            <span class="block text-sm font-bold text-white"><i class="fa-solid fa-shuffle text-amber-400 mr-1.5"></i> Dynamic Random (Default)</span>
+                            <span class="block text-xs text-slate-400 mt-1">Randomly chooses a new Genshin Impact landscape from 39 game wallpapers on each page load.</span>
+                        </div>
+                    </label>
+
+                    <label id="modeStaticLabel" class="flex items-start p-4 rounded-xl border cursor-pointer transition"
+                           th:classappend="${settings.backgroundMode == 'STATIC' ? 'border-amber-500/60 bg-amber-500/10' : 'border-slate-700 bg-slate-900/60'}">
+                        <input type="radio" th:field="${settings.backgroundMode}" value="STATIC" class="mt-1 text-amber-500 focus:ring-amber-500" onchange="toggleBackgroundPicker(this.value)">
+                        <div class="ml-3">
+                            <span class="block text-sm font-bold text-white"><i class="fa-solid fa-image text-amber-400 mr-1.5"></i> Static Wallpaper</span>
+                            <span class="block text-xs text-slate-400 mt-1">Locks the application background to a single chosen Genshin Impact landscape artwork.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Static Wallpaper Selection Grid -->
+                <div id="staticBackgroundPicker" class="pt-3 border-t border-slate-800 space-y-3" th:classappend="${settings.backgroundMode != 'STATIC' ? 'hidden' : ''}">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Choose Static Wallpaper</label>
+                            <p class="text-xs text-slate-400">Click any artwork below to select it:</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-slate-400">Active Selection:</span>
+                            <span class="text-xs font-mono font-semibold text-amber-400 px-2.5 py-1 rounded bg-slate-900 border border-slate-700" id="selectedBgLabel" th:text="${settings.staticBackground ?: 'background_1.png'}">background_1.png</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-80 overflow-y-auto p-2.5 bg-slate-950/80 rounded-xl border border-slate-800">
+                        <label th:each="bg : ${allBackgrounds}"
+                               class="relative group rounded-lg overflow-hidden border-2 cursor-pointer transition aspect-video flex items-end justify-center bg-slate-900 shadow-sm"
+                               th:classappend="${settings.staticBackground == bg ? 'border-amber-400 ring-2 ring-amber-400/50' : 'border-slate-800 hover:border-slate-600'}">
+                            <input type="radio" th:field="${settings.staticBackground}" th:value="${bg}" class="sr-only" onchange="selectWallpaper(this)">
+                            <img th:src="@{'/images/' + ${bg}}" alt="Wallpaper" loading="lazy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-200">
+                            <span class="relative z-10 w-full text-[10px] text-center font-mono py-0.5 bg-black/75 backdrop-blur-sm text-slate-200 truncate px-1" th:text="${bg}"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <!-- AI Vision Scanner Option -->
             <div class="pt-4 border-t border-slate-800 space-y-3">
                 <div class="flex items-center justify-between">
@@ -135,6 +192,44 @@
         </div>
     </div>
 
+    <!-- Interactive Background Scripts -->
+    <script>
+        function toggleBackgroundPicker(mode) {
+            const picker = document.getElementById('staticBackgroundPicker');
+            const randomLabel = document.getElementById('modeRandomLabel');
+            const staticLabel = document.getElementById('modeStaticLabel');
+
+            if (mode === 'STATIC') {
+                picker.classList.remove('hidden');
+                staticLabel.classList.add('border-amber-500/60', 'bg-amber-500/10');
+                staticLabel.classList.remove('border-slate-700', 'bg-slate-900/60');
+                randomLabel.classList.remove('border-amber-500/60', 'bg-amber-500/10');
+                randomLabel.classList.add('border-slate-700', 'bg-slate-900/60');
+            } else {
+                picker.classList.add('hidden');
+                randomLabel.classList.add('border-amber-500/60', 'bg-amber-500/10');
+                randomLabel.classList.remove('border-slate-700', 'bg-slate-900/60');
+                staticLabel.classList.remove('border-amber-500/60', 'bg-amber-500/10');
+                staticLabel.classList.add('border-slate-700', 'bg-slate-900/60');
+            }
+        }
+
+        function selectWallpaper(radio) {
+            document.querySelectorAll('#staticBackgroundPicker label').forEach(lbl => {
+                lbl.classList.remove('border-amber-400', 'ring-2', 'ring-amber-400/50');
+                lbl.classList.add('border-slate-800');
+            });
+            const label = radio.closest('label');
+            if (label) {
+                label.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/50');
+                label.classList.remove('border-slate-800');
+            }
+            const labelDisplay = document.getElementById('selectedBgLabel');
+            if (labelDisplay) {
+                labelDisplay.textContent = radio.value;
+            }
+        }
+    </script>
 </div>
 </body>
 </html>

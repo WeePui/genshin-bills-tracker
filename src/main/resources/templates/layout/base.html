@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:replace="${title}">Genshin Bills Tracker</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -19,6 +21,9 @@
                             border: '#1e293b',
                             accent: '#6366f1'
                         }
+                    },
+                    fontFamily: {
+                        genshin: ['HYWenHei', 'Plus Jakarta Sans', 'sans-serif']
                     }
                 }
             }
@@ -33,25 +38,42 @@
     <script th:src="@{/js/scanner.js}"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        @font-face {
+            font-family: 'HYWenHei';
+            src: url('/fonts/hywenhei_font.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #0b0f19;
             color: #e2e8f0;
+        }
+        h1, h2, h3, h4, .font-genshin {
+            font-family: 'HYWenHei', 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: 0.02em;
         }
         .glow-gold {
             box-shadow: 0 0 15px rgba(236, 201, 75, 0.25);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100">
+<body class="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100 relative">
+
+    <!-- Dynamic Genshin Impact Fullscreen Background -->
+    <div th:if="${currentBackground != null && !currentBackground.empty}"
+         class="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat bg-fixed transition-all duration-700 pointer-events-none"
+         th:style="'background-image: linear-gradient(to bottom, rgba(11, 15, 25, 0.82), rgba(11, 15, 25, 0.94)), url(' + @{'/images/' + ${currentBackground}} + ');'">
+    </div>
 
     <!-- Top Navigation Bar -->
-    <header class="border-b border-slate-800 bg-[#0d1322]/90 backdrop-blur-md sticky top-0 z-40">
+    <header class="border-b border-slate-800/80 bg-[#0d1322]/85 backdrop-blur-md sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
-                    <a th:href="@{/dashboard}" class="flex items-center space-x-2 text-amber-400 font-bold text-xl tracking-tight">
-                        <i class="fa-solid fa-gem text-amber-400"></i>
+                    <a th:href="@{/dashboard}" class="flex items-center space-x-2.5 text-amber-400 font-bold text-xl tracking-tight font-genshin">
+                        <img th:src="@{/images/logo.png}" alt="Logo" class="w-8 h-8 object-contain drop-shadow-md">
                         <span>Genshin <span class="text-white">Bills Vault</span></span>
                     </a>
                     <span class="text-xs px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20 font-medium">Recovery Ready</span>

@@ -21,6 +21,12 @@ public class AppSettings {
     private BigDecimal usdToEurRate = new BigDecimal("0.92");
     private BigDecimal usdToJpyRate = new BigDecimal("155");
 
+    @Column(length = 16)
+    private String backgroundMode = "RANDOM"; // "RANDOM" or "STATIC"
+
+    @Column(length = 64)
+    private String staticBackground = "background_1.png";
+
     public AppSettings() {}
 
     public Long getId() { return id; }
@@ -40,4 +46,14 @@ public class AppSettings {
 
     public BigDecimal getUsdToJpyRate() { return usdToJpyRate; }
     public void setUsdToJpyRate(BigDecimal usdToJpyRate) { this.usdToJpyRate = usdToJpyRate; }
+
+    public String getBackgroundMode() {
+        return (backgroundMode != null && !backgroundMode.isBlank()) ? backgroundMode : "RANDOM";
+    }
+    public void setBackgroundMode(String backgroundMode) { this.backgroundMode = backgroundMode; }
+
+    public String getStaticBackground() {
+        return (staticBackground != null && !staticBackground.isBlank()) ? staticBackground : "background_1.png";
+    }
+    public void setStaticBackground(String staticBackground) { this.staticBackground = staticBackground; }
 }
