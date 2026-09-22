@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title th:text="${isNew ? 'New Bill & Invoice Scanner' : 'Edit Bill'}">Add Bill</title>
+</head>
+<body>
+<div th:fragment="content" class="max-w-4xl mx-auto space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
+                <i class="fa-solid fa-receipt text-amber-400"></i>
+                <span th:text="${isNew ? 'Record New Bill & Evidence' : 'Edit Transaction Record'}">Record Bill</span>
+            </h1>
+            <p class="text-sm text-slate-400 mt-1">Attach order screenshots to track spending and preserve proofs for account recovery.</p>
+        </div>
+        <a th:href="@{/bills}" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs transition">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Bills
+        </a>
+    </div>
+
+    <!-- INVOICE SCREENSHOT SCANNER (Dropzone) -->
+    <div th:if="${isNew}" class="p-5 rounded-2xl bg-gradient-to-r from-[#131b2e] to-[#1c2438] border border-amber-500/30 shadow-xl space-y-4">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white">Smart Invoice Screenshot Scanner</h3>
+                    <p class="text-xs text-slate-400">Drop your receipt screenshot to automatically detect Order ID, Amount, Item & Date</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button type="button" id="scanAiBtn" class="hidden px-2.5 py-1 text-xs rounded bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-600/50">
+                    <i class="fa-solid fa-brain mr-1"></i> Scan with AI
+                </button>
+                <span class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Offline OCR Ready</span>
+            </div>
+        </div>
+
+        <div id="dropzone" class="border-2 border-dashed border-slate-700 hover:border-amber-400/60 rounded-xl p-6 text-center cursor-pointer transition bg-slate-900/40 hover:bg-slate-900/60">
+            <input type="file" id="scannerFileInput" accept="image/*,application/pdf" class="hidden">
+            <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-500 mb-2"></i>
+            <p class="text-sm font-medium text-slate-300">Click or drag & drop invoice screenshot here</p>
+            <p class="text-xs text-slate-500 mt-1">Supports Google Play (GPA.xxxx), Apple receipts, PayPal, Codashop, Razer Gold</p>
+        </div>
+
+        <!-- Scanner Progress & Results -->
+        <div id="scannerStatus" class="hidden space-y-2">
+            <div class="flex items-center justify-between text-xs text-slate-400">
+                <span id="scannerStatusText"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Scanning image...</span>
+                <span id="scannerProgressPercent">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                <div id="scannerProgressBar" class="bg-amber-400 h-1.5 transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div id="detectedBadges" class="flex flex-wrap gap-1.5 pt-1">
+                <!-- Badges will populate here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK PRESETS -->
+    <div class="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+        <div class="text-xs font-semibold text-slate-400 mb-2 flex items-center space-x-1.5">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>Quick Presets (Click to autofill standard Genshin pack details):</span>
+        </div>
+        <div class="flex flex-wrap gap-2 text-xs">
+            <button type="button" onclick="applyPreset('WELKIN_MOON', '4.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/20 hover:text-amber-300 border border-slate-700 transition">
+                🌙 Welkin Moon ($4.99)
+            </button>
+            <button type="button" onclick="applyPreset('BATTLE_PASS_HYMN', '9.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-500/20 hover:text-indigo-300 border border-slate-700 transition">
+                ⚔️ Gnostic Hymn ($9.99)
+            </button>
+            <button type="button" onclick="applyPreset('BATTLE_PASS_CHORUS', '19.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-indigo-500/20 hover:text-indigo-300 border border-slate-700 transition">
+                👑 Gnostic Chorus ($19.99)
+            </button>
+            <button type="button" onclick="applyPreset('GENESIS_6480', '99.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-amber-500/20 hover:text-amber-300 border border-slate-700 transition">
+                💎 6480 Crystals ($99.99)
+            </button>
+            <button type="button" onclick="applyPreset('GENESIS_3280', '49.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition">
+                💎 3280 Crystals ($49.99)
+            </button>
+            <button type="button" onclick="applyPreset('GENESIS_1980', '29.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition">
+                💎 1980 Crystals ($29.99)
+            </button>
+            <button type="button" onclick="applyPreset('GENESIS_980', '14.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition">
+                💎 980 Crystals ($14.99)
+            </button>
+            <button type="button" onclick="applyPreset('GENESIS_300', '4.99', 'USD')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition">
+                💎 300 Crystals ($4.99)
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form th:action="@{/bills/save}" method="post" enctype="multipart/form-data" class="space-y-6">
+        <input type="hidden" th:if="${!isNew}" th:field="${bill.id}" />
+
+        <div class="p-6 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg space-y-5">
+
+            <!-- FIRST PURCHASE TOGGLE CALLOUT (CRITICAL) -->
+            <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+                        ⭐
+                    </div>
+                    <div>
+                        <label for="firstPurchaseCheckbox" class="font-bold text-sm text-white cursor-pointer flex items-center space-x-2">
+                            <span>First Purchase on this Account</span>
+                        </label>
+                        <p class="text-xs text-amber-300/80">HoYoverse Customer Support strictly requires the 1st purchase order ID and receipt for account recovery.</p>
+                    </div>
+                </div>
+                <div>
+                    <input type="checkbox" id="firstPurchaseCheckbox" name="firstPurchase" th:checked="${bill.firstPurchase}" value="true"
+                           class="w-5 h-5 rounded text-amber-500 bg-slate-900 border-slate-700 focus:ring-amber-500 focus:ring-offset-slate-900 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Row 1: Account & Purchase Date -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Genshin Account *</label>
+                    <select id="accountIdSelect" name="accountId" required
+                            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                        <option value="" disabled th:selected="${bill.account == null}">-- Select Genshin Account --</option>
+                        <option th:each="acc : ${accounts}"
+                                th:value="${acc.id}"
+                                th:text="${acc.nickname + ' (UID: ' + acc.uid + ' - ' + acc.server.displayName + ')'}"
+                                th:selected="${bill.account != null && bill.account.id == acc.id}">Account</option>
+                    </select>
+                    <p th:if="${accounts.empty}" class="text-xs text-rose-400 mt-1">
+                        No accounts created yet! <a th:href="@{/accounts/new}" class="underline text-amber-400">Add an account first</a>.
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Purchase Date & Time *</label>
+                    <input type="datetime-local" id="purchaseDateInput" name="purchaseDateStr" required
+                           th:value="${#temporals.format(bill.purchaseDate, 'yyyy-MM-dd''T''HH:mm')}"
+                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                </div>
+            </div>
+
+            <!-- Row 2: Item Category & Custom Name -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Item Category *</label>
+                    <select id="itemCategorySelect" th:field="${bill.itemCategory}" required
+                            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat}"
+                                th:text="${cat.displayName}">Category</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Custom Item Name (Optional)</label>
+                    <input type="text" id="customItemNameInput" th:field="${bill.customItemName}" placeholder="e.g. Jean Sea Breeze Dandelion skin"
+                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                </div>
+            </div>
+
+            <!-- Row 3: Platform & Payment Method -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Platform / Store Channel *</label>
+                    <select id="platformSelect" th:field="${bill.platform}" required
+                            class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                        <option th:each="plat : ${platforms}"
+                                th:value="${plat}"
+                                th:text="${plat.displayName}">Platform</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Payment Method</label>
+                    <input type="text" id="paymentMethodInput" th:field="${bill.paymentMethod}" placeholder="e.g. Visa ending in 1234, PayPal, MoMo"
+                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                </div>
+            </div>
+
+            <!-- Row 4: Order ID & Amount -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="sm:col-span-2">
+                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                        Order / Transaction ID <span class="text-amber-400 font-normal">(Crucial for recovery)</span>
+                    </label>
+                    <input type="text" id="orderIdInput" th:field="${bill.orderId}" placeholder="e.g. GPA.3341-xxxx-xxxx-xxxxx or Apple Invoice ID"
+                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 font-mono text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Amount *</label>
+                        <input type="number" step="0.01" id="amountInput" th:field="${bill.amount}" required placeholder="4.99"
+                               class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Currency *</label>
+                        <input type="text" id="currencyInput" th:field="${bill.currency}" required placeholder="USD" maxlength="6"
+                               class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm uppercase rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 5: Notes -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Notes / Context (Optional)</label>
+                <textarea th:field="${bill.notes}" rows="2" placeholder="e.g. Pulled Raiden Shogun C2 with these crystals; Purchased during 4.2 banner"
+                          class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 focus:border-amber-500"></textarea>
+            </div>
+
+            <!-- Row 6: Attach Receipts (Images / PDFs) -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Attach Receipt Proof Files</label>
+                <input type="file" id="receiptFiles" name="receiptFiles" multiple accept="image/*,application/pdf"
+                       class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-400 hover:file:bg-slate-700 cursor-pointer">
+                <p class="text-xs text-slate-500 mt-1">You can attach multiple screenshots, email invoices, or PDF receipts.</p>
+            </div>
+
+            <!-- If editing, show existing attachments -->
+            <div th:if="${!isNew && !bill.attachments.empty}" class="border-t border-slate-800 pt-4">
+                <h4 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Attached Receipts:</h4>
+                <div class="flex flex-wrap gap-3">
+                    <div th:each="att : ${bill.attachments}" class="p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
+                        <img th:src="@{'/attachments/' + ${att.storedFileName}}" alt="Receipt" class="w-10 h-10 object-cover rounded cursor-pointer"
+                             th:onclick="'openLightbox(\'/attachments/' + ${att.storedFileName} + '\')'">
+                        <div class="text-xs">
+                            <span class="text-white block font-medium max-w-[150px] truncate" th:text="${att.originalFileName}">receipt.png</span>
+                            <span th:if="${att.primaryProof}" class="text-[10px] text-amber-400">Primary Proof</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex items-center justify-end space-x-3">
+            <a th:href="@{/bills}" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition">
+                Cancel
+            </a>
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-lg transition flex items-center space-x-2">
+                <i class="fa-solid fa-floppy-disk"></i>
+                <span th:text="${isNew ? 'Save Bill Record' : 'Update Bill Record'}">Save Bill</span>
+            </button>
+        </div>
+    </form>
+
+</div>
+
+<!-- Dropzone and Scanner Script -->
+<script>
+    function applyPreset(category, price, currency) {
+        document.getElementById('itemCategorySelect').value = category;
+        document.getElementById('amountInput').value = price;
+        document.getElementById('currencyInput').value = currency;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('scannerFileInput');
+        const receiptFilesInput = document.getElementById('receiptFiles');
+        const statusBox = document.getElementById('scannerStatus');
+        const statusText = document.getElementById('scannerStatusText');
+        const progressBar = document.getElementById('scannerProgressBar');
+        const progressPercent = document.getElementById('scannerProgressPercent');
+        const badgesBox = document.getElementById('detectedBadges');
+        const scanAiBtn = document.getElementById('scanAiBtn');
+
+        // Check if Gemini Vision is configured
+        const visionStatus = await checkVisionStatus();
+        if (visionStatus && visionStatus.visionConfigured) {
+            scanAiBtn?.classList.remove('hidden');
+        }
+
+        dropzone?.addEventListener('click', () => fileInput.click());
+
+        dropzone?.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('border-amber-400', 'bg-slate-900/80');
+        });
+
+        dropzone?.addEventListener('dragleave', () => {
+            dropzone.classList.remove('border-amber-400', 'bg-slate-900/80');
+        });
+
+        dropzone?.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('border-amber-400', 'bg-slate-900/80');
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFileScan(e.dataTransfer.files[0]);
+                syncToReceiptsInput(e.dataTransfer.files);
+            }
+        });
+
+        fileInput?.addEventListener('change', () => {
+            if (fileInput.files && fileInput.files.length > 0) {
+                handleFileScan(fileInput.files[0]);
+                syncToReceiptsInput(fileInput.files);
+            }
+        });
+
+        function syncToReceiptsInput(files) {
+            // Also assign the file to the main multipart form input so it gets saved on submit!
+            if (receiptFilesInput) {
+                const dataTransfer = new DataTransfer();
+                for (let i = 0; i < files.length; i++) {
+                    dataTransfer.items.add(files[i]);
+                }
+                receiptFilesInput.files = dataTransfer.files;
+            }
+        }
+
+        let currentScanningFile = null;
+
+        function handleFileScan(file) {
+            currentScanningFile = file;
+            statusBox.classList.remove('hidden');
+            badgesBox.innerHTML = '';
+
+            scanInvoiceImage(
+                file,
+                (percent, msg) => {
+                    progressBar.style.width = percent + '%';
+                    progressPercent.textContent = percent + '%';
+                    statusText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> ' + msg;
+                },
+                (result) => {
+                    statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Scan complete!';
+                    applyScanResult(result);
+                },
+                (err) => {
+                    statusText.innerHTML = '<i class="fa-solid fa-circle-exclamation text-rose-400 mr-1"></i> OCR failed: ' + err.message;
+                }
+            );
+        }
+
+        scanAiBtn?.addEventListener('click', () => {
+            if (!currentScanningFile && fileInput.files.length > 0) {
+                currentScanningFile = fileInput.files[0];
+            }
+            if (!currentScanningFile) {
+                alert('Please select or drop a screenshot first.');
+                return;
+            }
+            statusBox.classList.remove('hidden');
+            badgesBox.innerHTML = '';
+            scanWithGeminiVision(
+                currentScanningFile,
+                (percent, msg) => {
+                    progressBar.style.width = percent + '%';
+                    progressPercent.textContent = percent + '%';
+                    statusText.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> ' + msg;
+                },
+                (result) => {
+                    statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> AI Vision analysis complete!';
+                    applyScanResult(result);
+                },
+                (err) => {
+                    statusText.innerHTML = '<i class="fa-solid fa-circle-exclamation text-rose-400 mr-1"></i> ' + err.message;
+                }
+            );
+        });
+
+        function applyScanResult(result) {
+            if (!result) return;
+
+            if (result.orderId) {
+                document.getElementById('orderIdInput').value = result.orderId;
+                addBadge('Order ID: ' + result.orderId);
+            }
+            if (result.itemCategory) {
+                document.getElementById('itemCategorySelect').value = result.itemCategory;
+                addBadge('Item: ' + result.itemCategory);
+            }
+            if (result.customItemName) {
+                document.getElementById('customItemNameInput').value = result.customItemName;
+            }
+            if (result.platform) {
+                document.getElementById('platformSelect').value = result.platform;
+                addBadge('Platform: ' + result.platform);
+            }
+            if (result.paymentMethod) {
+                document.getElementById('paymentMethodInput').value = result.paymentMethod;
+                addBadge('Payment: ' + result.paymentMethod);
+            }
+            if (result.amount) {
+                document.getElementById('amountInput').value = result.amount;
+                addBadge('Amount: ' + result.amount);
+            }
+            if (result.currency) {
+                document.getElementById('currencyInput').value = result.currency;
+                addBadge('Currency: ' + result.currency);
+            }
+            if (result.purchaseDate) {
+                const dateStr = result.purchaseDate.substring(0, 16);
+                document.getElementById('purchaseDateInput').value = dateStr;
+                addBadge('Date: ' + dateStr.replace('T', ' '));
+            }
+        }
+
+        function addBadge(text) {
+            const span = document.createElement('span');
+            span.className = 'px-2 py-0.5 rounded text-[11px] bg-amber-400/20 text-amber-300 border border-amber-400/30 font-mono';
+            span.innerHTML = '<i class="fa-solid fa-check text-[10px] mr-1"></i> ' + text;
+            badgesBox.appendChild(span);
+        }
+    });
+</script>
+</body>
+</html>

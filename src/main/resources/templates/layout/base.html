@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - Genshin Bills Tracker' : 'Genshin Bills Tracker & Recovery Vault'}">Genshin Bills Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        genshin: {
+                            gold: '#ecc94b',
+                            dark: '#0b0f19',
+                            card: '#131b2e',
+                            border: '#1e293b',
+                            accent: '#6366f1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Tesseract.js (Client-side OCR) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script th:src="@{/js/scanner.js}"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+            color: #e2e8f0;
+        }
+        .glow-gold {
+            box-shadow: 0 0 15px rgba(236, 201, 75, 0.25);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100">
+
+    <!-- Top Navigation Bar -->
+    <header class="border-b border-slate-800 bg-[#0d1322]/90 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <a th:href="@{/dashboard}" class="flex items-center space-x-2 text-amber-400 font-bold text-xl tracking-tight">
+                        <i class="fa-solid fa-gem text-amber-400"></i>
+                        <span>Genshin <span class="text-white">Bills Vault</span></span>
+                    </a>
+                    <span class="text-xs px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20 font-medium">Recovery Ready</span>
+                </div>
+
+                <nav class="hidden md:flex items-center space-x-1">
+                    <a th:href="@{/dashboard}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
+                       th:classappend="${currentNav == 'dashboard' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
+                        <i class="fa-solid fa-chart-pie mr-1.5 text-xs"></i> Dashboard
+                    </a>
+                    <a th:href="@{/bills}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
+                       th:classappend="${currentNav == 'bills' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
+                        <i class="fa-solid fa-receipt mr-1.5 text-xs"></i> Bills & Proofs
+                    </a>
+                    <a th:href="@{/bills/new}" class="px-3 py-2 rounded-lg text-sm font-medium transition bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30">
+                        <i class="fa-solid fa-plus-circle mr-1.5 text-xs"></i> Add / Scan Bill
+                    </a>
+                    <a th:href="@{/recovery}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
+                       th:classappend="${currentNav == 'recovery' ? 'bg-slate-800 text-emerald-400' : 'text-slate-300'}">
+                        <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-emerald-400"></i> Recovery Center
+                    </a>
+                    <a th:href="@{/accounts}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
+                       th:classappend="${currentNav == 'accounts' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
+                        <i class="fa-solid fa-user-shield mr-1.5 text-xs"></i> Accounts
+                    </a>
+                    <a th:href="@{/settings}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
+                       th:classappend="${currentNav == 'settings' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
+                        <i class="fa-solid fa-sliders mr-1.5 text-xs"></i> Settings
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Alerts -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
+        <div th:if="${successMessage}" class="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <span th:text="${successMessage}">Success message</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-200"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div th:if="${errorMessage}" class="p-4 rounded-xl bg-rose-950/60 border border-rose-500/30 text-rose-300 flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-circle-exclamation text-rose-400"></i>
+                <span th:text="${errorMessage}">Error message</span>
+            </div>
+            <button onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-200"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+        <div th:replace="${content}">
+            <!-- Page body replaced here -->
+        </div>
+    </main>
+
+    <!-- Global Image Lightbox Modal -->
+    <div id="imageLightbox" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center">
+            <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-white hover:text-amber-400 text-2xl px-3 py-1">
+                <i class="fa-solid fa-xmark"></i> Close
+            </button>
+            <img id="lightboxImg" src="" alt="Receipt Image" class="max-h-[80vh] max-w-full rounded-lg shadow-2xl object-contain border border-slate-700">
+            <div class="mt-3 flex items-center space-x-4">
+                <a id="lightboxDownloadBtn" href="#" download class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm border border-slate-600">
+                    <i class="fa-solid fa-download mr-1"></i> Download Original
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-[#0d1322] py-6 mt-12 text-center text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>Genshin Bills Tracker &bull; 100% Local, Offline-First &bull; Tailored for HoYoverse Account Recovery</p>
+        </div>
+    </footer>
+
+    <script>
+        function openLightbox(imageUrl, downloadUrl) {
+            const modal = document.getElementById('imageLightbox');
+            const img = document.getElementById('lightboxImg');
+            const dlBtn = document.getElementById('lightboxDownloadBtn');
+            img.src = imageUrl;
+            dlBtn.href = downloadUrl || imageUrl;
+            modal.classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('imageLightbox').classList.add('hidden');
+            document.getElementById('lightboxImg').src = '';
+        }
+
+        document.getElementById('imageLightbox')?.addEventListener('click', function(e) {
+            if (e.target === this) closeLightbox();
+        });
+    </script>
+</body>
+</html>

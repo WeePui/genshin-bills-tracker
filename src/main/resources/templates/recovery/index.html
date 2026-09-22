@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>HoYoverse Account Recovery Center</title>
+</head>
+<body>
+<div th:fragment="content" class="space-y-6">
+
+    <!-- Header & Account Selector -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+                <span>HoYoverse Account Recovery Center</span>
+            </h1>
+            <p class="text-sm text-slate-400 mt-1">
+                Your emergency vault. In case your account is compromised or lost, access the exact proofs required by HoYoverse Customer Support.
+            </p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <form th:action="@{/recovery}" method="get" class="flex items-center space-x-2">
+                <label for="recoveryAccountSelect" class="text-xs font-medium text-slate-400">Account:</label>
+                <select id="recoveryAccountSelect" name="accountId" onchange="this.form.submit()"
+                        class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2 focus:ring-emerald-500">
+                    <option th:each="acc : ${accounts}"
+                            th:value="${acc.id}"
+                            th:text="${acc.nickname + ' (UID: ' + acc.uid + ')'}"
+                            th:selected="${selectedAccountId == acc.id}">Account</option>
+                </select>
+            </form>
+
+            <a th:if="${account != null}" th:href="@{'/recovery/' + ${account.id} + '/download-zip'}"
+               class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center space-x-2 transition">
+                <i class="fa-solid fa-file-zipper text-sm"></i>
+                <span>Download Recovery Dossier (.ZIP)</span>
+            </a>
+        </div>
+    </div>
+
+    <div th:if="${account == null}" class="text-center py-16 text-slate-500">
+        <i class="fa-solid fa-user-shield text-5xl mb-3 opacity-30"></i>
+        <p class="text-base text-slate-400 font-semibold">No accounts found.</p>
+        <p class="text-xs text-slate-500 mt-1">Please register your Genshin Account UID and details first.</p>
+        <a th:href="@{/accounts/new}" class="mt-4 inline-block px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl text-xs font-bold">
+            Add Genshin Account
+        </a>
+    </div>
+
+    <div th:if="${account != null}" class="space-y-6">
+
+        <!-- Critical First Purchase Banner -->
+        <div class="p-6 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#131b2e] to-[#131b2e] border border-emerald-500/30 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-certificate"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                            <span>First Purchase Proof (Primary Recovery Key)</span>
+                            <span th:if="${firstPurchase != null}" class="text-[11px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Verified</span>
+                            <span th:if="${firstPurchase == null}" class="text-[11px] px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Missing</span>
+                        </h2>
+                        <p class="text-xs text-slate-400">HoYoverse Customer Support heavily relies on the 1st purchase order number & receipt to grant account restoration.</p>
+                    </div>
+                </div>
+
+                <a th:if="${firstPurchase != null}" th:href="@{'/bills/' + ${firstPurchase.id}}"
+                   class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs rounded-lg border border-slate-700 transition">
+                    View 1st Bill Record &rarr;
+                </a>
+            </div>
+
+            <div th:if="${firstPurchase != null}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-3 border-t border-slate-800/80 text-xs">
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                    <span class="text-slate-400 block mb-1">First Purchase Date:</span>
+                    <span class="font-mono font-semibold text-white text-sm" th:text="${#temporals.format(firstPurchase.purchaseDate, 'yyyy-MM-dd HH:mm')}">2021-09-28</span>
+                </div>
+
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                    <span class="text-slate-400 block mb-1">Order / Transaction ID:</span>
+                    <span class="font-mono font-semibold text-emerald-400 text-sm select-all" th:text="${firstPurchase.orderId != null ? firstPurchase.orderId : 'N/A'}">GPA.1234</span>
+                </div>
+
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                    <span class="text-slate-400 block mb-1">Platform / Store:</span>
+                    <span class="font-semibold text-white text-sm" th:text="${firstPurchase.platform.displayName}">Google Play</span>
+                </div>
+
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+                    <span class="text-slate-400 block mb-1">Amount & Item:</span>
+                    <span class="font-semibold text-amber-300 text-sm" th:text="${firstPurchase.amount + ' ' + firstPurchase.currency + ' (' + firstPurchase.displayItemName + ')'}">$4.99 Welkin</span>
+                </div>
+            </div>
+
+            <!-- Receipt thumbnail for first purchase -->
+            <div th:if="${firstPurchase != null && !firstPurchase.attachments.empty}" class="flex items-center space-x-3 pt-2">
+                <span class="text-xs text-slate-400">First Purchase Receipts:</span>
+                <div class="flex items-center space-x-2">
+                    <button th:each="att : ${firstPurchase.attachments}"
+                            th:onclick="'openLightbox(\'/attachments/' + ${att.storedFileName} + '\', \'/attachments/' + ${att.storedFileName} + '/download\')'"
+                            class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-emerald-400 text-xs rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
+                        <i class="fa-solid fa-image"></i>
+                        <span th:text="${att.originalFileName}">receipt.png</span>
+                    </button>
+                </div>
+            </div>
+
+            <div th:if="${firstPurchase == null}" class="text-xs text-rose-300 p-3 bg-rose-950/30 rounded-xl border border-rose-800/30">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                You haven't marked any transaction as the <strong>First Purchase</strong> yet.
+                <a th:href="@{/bills/new}" class="underline text-amber-400 ml-1">Add your 1st purchase bill now</a>.
+            </div>
+        </div>
+
+        <!-- 2-Column: Account Specs and CS Form Assistant -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+            <!-- Registration Specs (HoYoverse Form Questions 1-3) -->
+            <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg space-y-4">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 pb-2 flex items-center justify-between">
+                    <span>1. Registration & Device Profile</span>
+                    <a th:href="@{'/accounts/' + ${account.id} + '/edit'}" class="text-amber-400 hover:underline text-[11px]">Edit</a>
+                </h3>
+
+                <div class="space-y-3 text-xs">
+                    <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                        <span class="text-slate-400">Account UID:</span>
+                        <span class="font-mono font-semibold text-white" th:text="${account.uid}">800123456</span>
+                    </div>
+
+                    <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                        <span class="text-slate-400">Server Region:</span>
+                        <span class="font-medium text-white" th:text="${account.server.displayName}">Asia</span>
+                    </div>
+
+                    <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                        <span class="text-slate-400">In-game Nickname:</span>
+                        <span class="font-medium text-white" th:text="${account.nickname}">Traveler</span>
+                    </div>
+
+                    <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                        <span class="text-slate-400">First Login / Registration Date:</span>
+                        <span class="font-mono text-white" th:text="${account.registrationDate != null ? account.registrationDate : 'Not recorded'}">2020-09-28</span>
+                    </div>
+
+                    <div class="flex justify-between py-1.5 border-b border-slate-800/60">
+                        <span class="text-slate-400">Registration Device:</span>
+                        <span class="font-medium text-white" th:text="${account.registrationDevice != null ? account.registrationDevice : 'Not recorded'}">PC Windows</span>
+                    </div>
+
+                    <div class="flex justify-between py-1.5">
+                        <span class="text-slate-400">Initial Registration Method:</span>
+                        <span class="font-medium text-white" th:text="${account.registrationMethod != null ? account.registrationMethod : 'Not recorded'}">HoYoverse Account</span>
+                    </div>
+                </div>
+
+                <div th:if="${account.notes != null && !account.notes.isBlank()}" class="pt-2">
+                    <span class="text-slate-400 text-xs block mb-1">Account History Notes:</span>
+                    <p class="text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 whitespace-pre-line" th:text="${account.notes}">Notes</p>
+                </div>
+            </div>
+
+            <!-- Ready-to-Copy CS Dossier Box -->
+            <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg space-y-4 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                            <span>Formatted Recovery Dossier</span>
+                        </h3>
+                        <button onclick="copyDossierText()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs rounded border border-slate-700 transition">
+                            <i class="fa-regular fa-copy mr-1"></i> Copy Text
+                        </button>
+                    </div>
+
+                    <p class="text-xs text-slate-400 mt-2">
+                        Text below is pre-structured to answer the HoYoverse Account Retrieval Application form questions:
+                    </p>
+
+                    <textarea id="dossierTextArea" readonly rows="9"
+                              class="w-full mt-3 p-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-300 font-mono text-[11px] leading-relaxed resize-none focus:outline-none"
+                              th:text="${recoveryText}"></textarea>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+                    <span class="text-xs text-slate-500">Includes all order IDs & timestamps</span>
+                    <a th:href="@{'/recovery/' + ${account.id} + '/download-zip'}"
+                       class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-download"></i>
+                        <span>Download ZIP Package</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Recent Purchase History Table (Last 5 transactions) -->
+        <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                    <span>Recent Purchase Transactions Included in Dossier</span>
+                </h3>
+                <span class="text-xs text-slate-400" th:text="${totalBillsCount + ' total recorded'}">5 total</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="uppercase bg-slate-900/60 text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="py-2.5 px-3">Date</th>
+                            <th class="py-2.5 px-3">Item</th>
+                            <th class="py-2.5 px-3">Order / Txn ID</th>
+                            <th class="py-2.5 px-3">Platform</th>
+                            <th class="py-2.5 px-3">Amount</th>
+                            <th class="py-2.5 px-3">Proof Attached</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <tr th:each="bill : ${recentBills}">
+                            <td class="py-2.5 px-3 font-mono text-slate-400" th:text="${#temporals.format(bill.purchaseDate, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
+                            <td class="py-2.5 px-3 font-medium text-white" th:text="${bill.displayItemName}">Welkin</td>
+                            <td class="py-2.5 px-3 font-mono text-amber-300" th:text="${bill.orderId != null ? bill.orderId : 'N/A'}">GPA.1234</td>
+                            <td class="py-2.5 px-3 text-slate-400" th:text="${bill.platform.displayName}">Google Play</td>
+                            <td class="py-2.5 px-3 font-semibold text-white" th:text="${bill.amount + ' ' + bill.currency}">$4.99 USD</td>
+                            <td class="py-2.5 px-3">
+                                <span th:if="${!bill.attachments.empty}" class="text-emerald-400 font-semibold">&check; <span th:text="${bill.attachments.size() + ' file(s)'}">1 file</span></span>
+                                <span th:if="${bill.attachments.empty}" class="text-slate-600">None</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function copyDossierText() {
+        const textArea = document.getElementById('dossierTextArea');
+        if (textArea) {
+            navigator.clipboard.writeText(textArea.value).then(() => {
+                alert('HoYoverse Recovery Dossier text copied to clipboard!');
+            }).catch(err => {
+                textArea.select();
+                document.execCommand('copy');
+                alert('HoYoverse Recovery Dossier text copied!');
+            });
+        }
+    }
+</script>
+</body>
+</html>

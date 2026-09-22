@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: html}">
+<head>
+    <title>Purchase Bills & Invoices</title>
+</head>
+<body>
+<div th:fragment="content" class="space-y-6">
+
+    <!-- Header and Action -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
+                <i class="fa-solid fa-receipt text-amber-400"></i>
+                <span>Purchase Bills & Evidence Vault</span>
+            </h1>
+            <p class="text-sm text-slate-400 mt-1">Browse, filter, and inspect your full Genshin purchase history and proof screenshots.</p>
+        </div>
+        <a th:href="@{/bills/new}" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-lg flex items-center space-x-2 transition">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add / Scan New Bill</span>
+        </a>
+    </div>
+
+    <!-- Filter Form Bar -->
+    <div class="p-4 rounded-xl bg-[#131b2e] border border-slate-800 shadow">
+        <form th:action="@{/bills}" method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- Account Filter -->
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Account</label>
+                <select name="accountId" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-amber-500">
+                    <option value="">All Accounts</option>
+                    <option th:each="acc : ${accounts}"
+                            th:value="${acc.id}"
+                            th:text="${acc.nickname + ' (' + acc.uid + ')'}"
+                            th:selected="${selectedAccountId == acc.id}">Account</option>
+                </select>
+            </div>
+
+            <!-- Category Filter -->
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Item Category</label>
+                <select name="category" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-amber-500">
+                    <option value="">All Categories</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat}"
+                            th:text="${cat.displayName}"
+                            th:selected="${selectedCategory == cat}">Category</option>
+                </select>
+            </div>
+
+            <!-- Platform Filter -->
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Platform</label>
+                <select name="platform" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-amber-500">
+                    <option value="">All Platforms</option>
+                    <option th:each="plat : ${platforms}"
+                            th:value="${plat}"
+                            th:text="${plat.displayName}"
+                            th:selected="${selectedPlatform == plat}">Platform</option>
+                </select>
+            </div>
+
+            <!-- Keyword Search -->
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Search Order ID / Note</label>
+                <input type="text" name="search" th:value="${search}" placeholder="GPA.xxxx or note..."
+                       class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg p-2 focus:ring-amber-500">
+            </div>
+
+            <!-- Submit & Reset -->
+            <div class="flex items-end space-x-2">
+                <button type="submit" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-semibold rounded-lg border border-slate-700 transition">
+                    <i class="fa-solid fa-filter mr-1"></i> Filter
+                </button>
+                <a th:href="@{/bills}" class="py-2 px-3 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white text-xs rounded-lg border border-slate-800 transition">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bills Table -->
+    <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg">
+        <div th:if="${bills.empty}" class="text-center py-14 text-slate-500">
+            <i class="fa-solid fa-receipt text-5xl mb-3 opacity-25"></i>
+            <p class="text-base font-medium text-slate-400">No matching bills found.</p>
+            <p class="text-xs text-slate-500 mt-1">Try adjusting your filters or record a new transaction.</p>
+        </div>
+
+        <div th:unless="${bills.empty}" class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-slate-300">
+                <thead class="text-xs uppercase bg-slate-900/60 text-slate-400 border-b border-slate-800">
+                    <tr>
+                        <th class="py-3 px-4">Date</th>
+                        <th class="py-3 px-4">Account</th>
+                        <th class="py-3 px-4">Item</th>
+                        <th class="py-3 px-4">Platform</th>
+                        <th class="py-3 px-4">Order ID</th>
+                        <th class="py-3 px-4">Amount</th>
+                        <th class="py-3 px-4">Proofs</th>
+                        <th class="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    <tr th:each="bill : ${bills}" class="hover:bg-slate-800/40 transition">
+                        <td class="py-3 px-4 font-mono text-xs text-slate-400" th:text="${#temporals.format(bill.purchaseDate, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
+                        <td class="py-3 px-4">
+                            <span class="font-medium text-white block" th:text="${bill.account.nickname}">Nickname</span>
+                            <span class="text-xs text-slate-400 font-mono" th:text="${bill.account.uid}">UID</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <span class="font-medium text-amber-300" th:text="${bill.displayItemName}">Welkin</span>
+                            <span th:if="${bill.firstPurchase}" class="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30">1st Purchase</span>
+                        </td>
+                        <td class="py-3 px-4 text-xs text-slate-300" th:text="${bill.platform.displayName}">Google Play</td>
+                        <td class="py-3 px-4 font-mono text-xs text-slate-200">
+                            <span th:if="${bill.orderId != null}" th:text="${bill.orderId}">GPA.1234</span>
+                            <span th:if="${bill.orderId == null}" class="text-slate-600">None</span>
+                        </td>
+                        <td class="py-3 px-4 font-bold text-white">
+                            <span th:text="${bill.amount}">4.99</span> <span class="text-xs text-slate-400" th:text="${bill.currency}">USD</span>
+                        </td>
+                        <td class="py-3 px-4">
+                            <div th:if="${!bill.attachments.empty}" class="flex items-center space-x-1">
+                                <button th:each="att : ${bill.attachments}"
+                                        th:onclick="'openLightbox(\'/attachments/' + ${att.storedFileName} + '\', \'/attachments/' + ${att.storedFileName} + '/download\')'"
+                                        class="w-7 h-7 rounded border border-slate-700 bg-slate-900 overflow-hidden hover:border-amber-400 transition"
+                                        title="Click to view full receipt">
+                                    <img th:src="@{'/attachments/' + ${att.storedFileName}}" alt="Receipt thumbnail" class="w-full h-full object-cover">
+                                </button>
+                            </div>
+                            <span th:if="${bill.attachments.empty}" class="text-xs text-slate-600 italic">No proof</span>
+                        </td>
+                        <td class="py-3 px-4 text-right space-x-2">
+                            <a th:href="@{'/bills/' + ${bill.id}}" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs rounded border border-slate-700 transition">
+                                View
+                            </a>
+                            <a th:href="@{'/bills/' + ${bill.id} + '/edit'}" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded border border-slate-700 transition">
+                                Edit
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
