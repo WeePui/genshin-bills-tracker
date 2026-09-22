@@ -123,7 +123,9 @@
                         <td class="py-3 px-4">
                             <div th:if="${!bill.attachments.empty}" class="flex items-center space-x-1">
                                 <button th:each="att : ${bill.attachments}"
-                                        th:onclick="'openLightbox(\'/attachments/' + ${att.storedFileName} + '\', \'/attachments/' + ${att.storedFileName} + '/download\')'"
+                                        th:data-view="@{'/attachments/' + ${att.storedFileName}}"
+                                        th:data-download="@{'/attachments/' + ${att.storedFileName} + '/download'}"
+                                        onclick="openLightbox(this.dataset.view, this.dataset.download)"
                                         class="w-7 h-7 rounded border border-slate-700 bg-slate-900 overflow-hidden hover:border-amber-400 transition"
                                         title="Click to view full receipt">
                                     <img th:src="@{'/attachments/' + ${att.storedFileName}}" alt="Receipt thumbnail" class="w-full h-full object-cover">

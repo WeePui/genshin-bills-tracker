@@ -229,7 +229,8 @@
                 <div class="flex flex-wrap gap-3">
                     <div th:each="att : ${bill.attachments}" class="p-2 rounded-lg bg-slate-900 border border-slate-800 flex items-center space-x-2">
                         <img th:src="@{'/attachments/' + ${att.storedFileName}}" alt="Receipt" class="w-10 h-10 object-cover rounded cursor-pointer"
-                             th:onclick="'openLightbox(\'/attachments/' + ${att.storedFileName} + '\')'">
+                             th:data-view="@{'/attachments/' + ${att.storedFileName}}"
+                             onclick="openLightbox(this.dataset.view)">
                         <div class="text-xs">
                             <span class="text-white block font-medium max-w-[150px] truncate" th:text="${att.originalFileName}">receipt.png</span>
                             <span th:if="${att.primaryProof}" class="text-[10px] text-amber-400">Primary Proof</span>

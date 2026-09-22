@@ -44,7 +44,8 @@
                     <h3 class="text-lg font-bold text-white tracking-tight" th:text="${acc.nickname}">Traveler</h3>
                     <div class="flex items-center space-x-2 mt-0.5">
                         <span class="font-mono text-sm text-slate-300 font-semibold" th:text="'UID: ' + ${acc.uid}">UID: 800123456</span>
-                        <button th:onclick="'navigator.clipboard.writeText(\'' + ${acc.uid} + '\'); alert(\'UID copied!\');'"
+                        <button th:data-uid="${acc.uid}"
+                                onclick="navigator.clipboard.writeText(this.dataset.uid); alert('UID copied!');"
                                 class="p-1 text-slate-400 hover:text-white text-xs">
                             <i class="fa-regular fa-copy"></i>
                         </button>

@@ -68,7 +68,8 @@
                             <span class="font-mono text-xs bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700 text-slate-200 select-all"
                                   th:text="${bill.orderId != null ? bill.orderId : 'Not Recorded'}">GPA.1234-5678</span>
                             <button th:if="${bill.orderId != null}"
-                                    th:onclick="'navigator.clipboard.writeText(\'' + ${bill.orderId} + '\'); alert(\'Order ID copied to clipboard!\');'"
+                                    th:data-orderid="${bill.orderId}"
+                                    onclick="navigator.clipboard.writeText(this.dataset.orderid); alert('Order ID copied to clipboard!');"
                                     class="p-1.5 text-xs text-slate-400 hover:text-white bg-slate-800 rounded-lg hover:bg-slate-700">
                                 <i class="fa-regular fa-copy"></i>
                             </button>
@@ -109,7 +110,9 @@
                 <div th:unless="${bill.attachments.empty}" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div th:each="att : ${bill.attachments}" class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
                         <div class="aspect-video w-full rounded-lg overflow-hidden bg-black/40 border border-slate-800 cursor-pointer relative group"
-                             th:onclick="'openLightbox(\'/attachments/' + ${att.storedFileName} + '\', \'/attachments/' + ${att.storedFileName} + '/download\')'">
+                             th:data-view="@{'/attachments/' + ${att.storedFileName}}"
+                             th:data-download="@{'/attachments/' + ${att.storedFileName} + '/download'}"
+                             onclick="openLightbox(this.dataset.view, this.dataset.download)">
                             <img th:src="@{'/attachments/' + ${att.storedFileName}}" alt="Receipt proof" class="w-full h-full object-contain group-hover:scale-105 transition duration-200">
                             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white text-xs space-x-1">
                                 <i class="fa-solid fa-magnifying-glass-plus"></i>

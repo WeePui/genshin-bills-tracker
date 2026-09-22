@@ -99,7 +99,9 @@
                 <span class="text-xs text-slate-400">First Purchase Receipts:</span>
                 <div class="flex items-center space-x-2">
                     <button th:each="att : ${firstPurchase.attachments}"
-                            th:onclick="'openLightbox(\'/attachments/' + ${att.storedFileName} + '\', \'/attachments/' + ${att.storedFileName} + '/download\')'"
+                            th:data-view="@{'/attachments/' + ${att.storedFileName}}"
+                            th:data-download="@{'/attachments/' + ${att.storedFileName} + '/download'}"
+                            onclick="openLightbox(this.dataset.view, this.dataset.download)"
                             class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 text-emerald-400 text-xs rounded-lg border border-slate-700 flex items-center space-x-1.5 transition">
                         <i class="fa-solid fa-image"></i>
                         <span th:text="${att.originalFileName}">receipt.png</span>
