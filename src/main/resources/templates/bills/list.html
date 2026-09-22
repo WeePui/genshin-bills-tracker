@@ -15,9 +15,9 @@
             </h1>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1" th:text="#{bills.subtitle}">Browse, filter, and inspect your full Genshin purchase history and proof screenshots.</p>
         </div>
-        <a th:href="@{/bills/new}" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-md flex items-center space-x-2 transition self-start md:self-auto">
-            <i class="fa-solid fa-plus"></i>
-            <span th:text="#{bills.action.new}">Add / Scan New Bill</span>
+        <a th:href="@{/bills/new}" class="px-3.5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-md inline-flex items-center justify-center gap-2 leading-none transition active:scale-95 self-start md:self-auto">
+            <i class="fa-solid fa-plus text-xs leading-none flex-shrink-0"></i>
+            <span class="leading-none" th:text="#{bills.action.new}">Add / Scan New Bill</span>
         </a>
     </div>
 
