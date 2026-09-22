@@ -110,9 +110,18 @@
                             <span class="text-xs text-slate-400 dark:text-slate-500 font-mono" th:text="${bill.account.uid}">UID</span>
                         </td>
                         <td class="py-3 px-4">
-                            <span class="font-medium text-amber-600 dark:text-amber-300" th:text="${bill.displayItemName}">Welkin</span>
-                            <span th:if="${bill.firstPurchase}" class="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30"
-                                  th:text="#{bills.firstPurchase.badge}">1st Purchase</span>
+                            <div class="flex items-center space-x-2.5">
+                                <img th:if="${bill.itemCategory.name() == 'WELKIN_MOON'}" th:src="@{/images/blessing_of_the_welkin_moon.webp}" alt="Welkin" class="w-6 h-6 object-contain flex-shrink-0 drop-shadow-sm">
+                                <img th:if="${bill.itemCategory.name() == 'BATTLE_PASS_HYMN' || bill.itemCategory.name() == 'BATTLE_PASS_CHORUS'}" th:src="@{/images/gnostic_hymn.webp}" alt="Battle Pass" class="w-6 h-6 object-contain flex-shrink-0 drop-shadow-sm">
+                                <img th:if="${bill.itemCategory.name() == 'GENESIS_CRYSTALS'}" th:src="@{/images/genesis_crystal.webp}" alt="Genesis Crystals" class="w-6 h-6 object-contain flex-shrink-0 drop-shadow-sm">
+                                <i th:if="${bill.itemCategory.name() != 'WELKIN_MOON' && bill.itemCategory.name() != 'BATTLE_PASS_HYMN' && bill.itemCategory.name() != 'BATTLE_PASS_CHORUS' && bill.itemCategory.name() != 'GENESIS_CRYSTALS'}" class="fa-solid fa-box text-slate-400 w-6 text-center text-xs"></i>
+                                <div>
+                                    <span class="font-medium text-amber-600 dark:text-amber-300 block" th:text="${bill.displayItemName}">Welkin</span>
+                                    <span th:if="${bill.firstPurchase}" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30">
+                                        <i class="fa-solid fa-star text-amber-500 mr-1 text-[9px]"></i> <span th:text="#{bills.firstPurchase.badge}">1st Purchase</span>
+                                    </span>
+                                </div>
+                            </div>
                         </td>
                         <td class="py-3 px-4 text-xs text-slate-600 dark:text-slate-300" th:text="#{${'platform.' + bill.platform}}">Google Play</td>
                         <td class="py-3 px-4 font-mono text-xs text-slate-700 dark:text-slate-200">

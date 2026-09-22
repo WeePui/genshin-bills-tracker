@@ -67,26 +67,32 @@
 
         <!-- Card 3: Welkin Moons -->
         <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md relative overflow-hidden transition-colors">
+            <div class="absolute -right-3 -bottom-3 opacity-25 dark:opacity-20 pointer-events-none">
+                <img th:src="@{/images/blessing_of_the_welkin_moon.webp}" alt="Welkin" class="w-20 h-20 object-contain drop-shadow">
+            </div>
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" th:text="#{dashboard.stat.welkinCount}">Welkin Moons</div>
             <div class="text-3xl font-extrabold text-amber-500 dark:text-amber-300 mt-2 flex items-baseline space-x-2">
                 <span th:text="${summary.welkinCount}">0</span>
                 <span class="text-xs font-normal text-slate-500 dark:text-slate-400">active</span>
             </div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center space-x-1">
-                <i class="fa-solid fa-moon text-amber-500 dark:text-amber-400/80"></i>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center space-x-1.5">
+                <img th:src="@{/images/blessing_of_the_welkin_moon.webp}" alt="Welkin" class="w-4 h-4 object-contain">
                 <span th:text="${(summary.welkinCount * 30) + ' total days'}">0 days</span>
             </div>
         </div>
 
         <!-- Card 4: Battle Passes -->
         <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md relative overflow-hidden transition-colors">
+            <div class="absolute -right-3 -bottom-3 opacity-25 dark:opacity-20 pointer-events-none">
+                <img th:src="@{/images/gnostic_hymn.webp}" alt="Battle Pass" class="w-20 h-20 object-contain drop-shadow">
+            </div>
             <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" th:text="#{dashboard.stat.battlePassCount}">Battle Passes</div>
             <div class="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-2 flex items-baseline space-x-2">
                 <span th:text="${summary.battlePassCount}">0</span>
                 <span class="text-xs font-normal text-slate-500 dark:text-slate-400">seasons</span>
             </div>
-            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center space-x-1">
-                <i class="fa-solid fa-award text-indigo-500 dark:text-indigo-400"></i>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center space-x-1.5">
+                <img th:src="@{/images/gnostic_hymn.webp}" alt="Battle Pass" class="w-4 h-4 object-contain">
                 <span>Gnostic Hymn / Chorus</span>
             </div>
         </div>
@@ -164,9 +170,18 @@
                             <span class="text-xs text-slate-400 dark:text-slate-500 block font-mono" th:text="${bill.account.uid}">UID</span>
                         </td>
                         <td class="py-3 px-4">
-                            <span class="font-medium text-amber-600 dark:text-amber-300" th:text="${bill.displayItemName}">Welkin Moon</span>
-                            <span th:if="${bill.firstPurchase}" class="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30"
-                                  th:text="#{bills.firstPurchase.badge}">1st Purchase</span>
+                            <div class="flex items-center space-x-2.5">
+                                <img th:if="${bill.itemCategory.name() == 'WELKIN_MOON'}" th:src="@{/images/blessing_of_the_welkin_moon.webp}" alt="Welkin" class="w-6 h-6 object-contain flex-shrink-0 drop-shadow-sm">
+                                <img th:if="${bill.itemCategory.name() == 'BATTLE_PASS_HYMN' || bill.itemCategory.name() == 'BATTLE_PASS_CHORUS'}" th:src="@{/images/gnostic_hymn.webp}" alt="Battle Pass" class="w-6 h-6 object-contain flex-shrink-0 drop-shadow-sm">
+                                <img th:if="${bill.itemCategory.name() == 'GENESIS_CRYSTALS'}" th:src="@{/images/genesis_crystal.webp}" alt="Genesis Crystals" class="w-6 h-6 object-contain flex-shrink-0 drop-shadow-sm">
+                                <i th:if="${bill.itemCategory.name() != 'WELKIN_MOON' && bill.itemCategory.name() != 'BATTLE_PASS_HYMN' && bill.itemCategory.name() != 'BATTLE_PASS_CHORUS' && bill.itemCategory.name() != 'GENESIS_CRYSTALS'}" class="fa-solid fa-box text-slate-400 w-6 text-center text-xs"></i>
+                                <div>
+                                    <span class="font-medium text-amber-600 dark:text-amber-300 block" th:text="${bill.displayItemName}">Welkin Moon</span>
+                                    <span th:if="${bill.firstPurchase}" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30">
+                                        <i class="fa-solid fa-star text-amber-500 mr-1 text-[9px]"></i> <span th:text="#{bills.firstPurchase.badge}">1st Purchase</span>
+                                    </span>
+                                </div>
+                            </div>
                         </td>
                         <td class="py-3 px-4 text-xs text-slate-600 dark:text-slate-300" th:text="${bill.platform.displayName}">Google Play</td>
                         <td class="py-3 px-4 font-mono text-xs text-slate-600 dark:text-slate-300">
