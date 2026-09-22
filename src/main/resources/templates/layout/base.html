@@ -143,44 +143,34 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
 
-                <!-- Logo & Brand -->
-                <div class="flex items-center space-x-3">
-                    <a th:href="@{/dashboard}" class="flex items-center space-x-2.5 text-amber-500 dark:text-amber-400 font-bold text-xl tracking-tight font-genshin">
-                        <img th:src="@{/images/logo.png}" alt="Logo" class="w-8 h-8 object-contain drop-shadow-md">
-                        <span>Genshin <span class="text-slate-900 dark:text-white">Bills Vault</span></span>
+                <!-- Left: Clean Logo & Main Functionality Navigation -->
+                <div class="flex items-center space-x-4 sm:space-x-6">
+                    <!-- Clean Logo Emblem (No Text) -->
+                    <a th:href="@{/dashboard}" class="flex items-center flex-shrink-0 transition transform hover:scale-105 active:scale-95" title="Dashboard">
+                        <img th:src="@{/images/logo.png}" alt="Logo" class="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-md">
                     </a>
-                    <span class="hidden sm:inline-block text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20 font-medium"
-                          th:text="#{app.subtitle}">Recovery Ready</span>
+
+                    <!-- Main Functionality Navigation Links (Dashboard, Bills, Add Bill, Recovery) -->
+                    <nav class="hidden md:flex items-center space-x-1">
+                        <a th:href="@{/dashboard}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                           th:classappend="${currentNav == 'dashboard' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                            <i class="fa-solid fa-chart-pie mr-1.5 text-xs"></i> <span th:text="#{nav.dashboard}">Dashboard</span>
+                        </a>
+                        <a th:href="@{/bills}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                           th:classappend="${currentNav == 'bills' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                            <i class="fa-solid fa-receipt mr-1.5 text-xs"></i> <span th:text="#{nav.bills}">Bills & Proofs</span>
+                        </a>
+                        <a th:href="@{/bills/new}" class="px-3 py-2 rounded-lg text-sm font-medium transition bg-amber-500/15 text-amber-600 dark:text-amber-300 hover:bg-amber-500/25 border border-amber-500/30">
+                            <i class="fa-solid fa-plus-circle mr-1.5 text-xs"></i> <span th:text="#{nav.addBill}">Add / Scan Bill</span>
+                        </a>
+                        <a th:href="@{/recovery}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                           th:classappend="${currentNav == 'recovery' ? 'bg-slate-200 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                            <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-emerald-500 dark:text-emerald-400"></i> <span th:text="#{nav.recovery}">Recovery</span>
+                        </a>
+                    </nav>
                 </div>
 
-                <!-- Desktop Navigation Links -->
-                <nav class="hidden lg:flex items-center space-x-1">
-                    <a th:href="@{/dashboard}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
-                       th:classappend="${currentNav == 'dashboard' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
-                        <i class="fa-solid fa-chart-pie mr-1.5 text-xs"></i> <span th:text="#{nav.dashboard}">Dashboard</span>
-                    </a>
-                    <a th:href="@{/bills}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
-                       th:classappend="${currentNav == 'bills' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
-                        <i class="fa-solid fa-receipt mr-1.5 text-xs"></i> <span th:text="#{nav.bills}">Bills & Proofs</span>
-                    </a>
-                    <a th:href="@{/bills/new}" class="px-3 py-2 rounded-lg text-sm font-medium transition bg-amber-500/15 text-amber-600 dark:text-amber-300 hover:bg-amber-500/25 border border-amber-500/30">
-                        <i class="fa-solid fa-plus-circle mr-1.5 text-xs"></i> <span th:text="#{nav.addBill}">Add / Scan Bill</span>
-                    </a>
-                    <a th:href="@{/recovery}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
-                       th:classappend="${currentNav == 'recovery' ? 'bg-slate-200 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
-                        <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-emerald-500 dark:text-emerald-400"></i> <span th:text="#{nav.recovery}">Recovery</span>
-                    </a>
-                    <a th:href="@{/accounts}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
-                       th:classappend="${currentNav == 'accounts' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
-                        <i class="fa-solid fa-user-shield mr-1.5 text-xs"></i> <span th:text="#{nav.accounts}">Accounts</span>
-                    </a>
-                    <a th:href="@{/settings}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
-                       th:classappend="${currentNav == 'settings' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
-                        <i class="fa-solid fa-sliders mr-1.5 text-xs"></i> <span th:text="#{nav.settings}">Settings</span>
-                    </a>
-                </nav>
-
-                <!-- Controls: Language Toggle & Theme Toggle -->
+                <!-- Right: Controls & Menu Dropdown -->
                 <div class="flex items-center space-x-2">
 
                     <!-- Language Switcher Pill -->
@@ -205,42 +195,55 @@
                         <i class="fa-solid fa-sun theme-icon-sun text-sm text-amber-400 hidden"></i>
                     </button>
 
-                    <!-- Mobile Hamburger Button -->
-                    <button type="button" onclick="toggleMobileMenu()" id="mobileMenuBtn"
-                            class="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                            aria-label="Open Navigation Menu">
-                        <i class="fa-solid fa-bars text-lg"></i>
-                    </button>
+                    <!-- Menu Button & Floating Dropdown -->
+                    <div class="relative" id="menuContainer">
+                        <button type="button" onclick="toggleMenuDropdown(event)" id="menuBtn"
+                                class="p-2 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center justify-center focus:outline-none"
+                                th:classappend="${currentNav == 'accounts' || currentNav == 'settings' ? 'text-amber-500 dark:text-amber-400 bg-slate-100 dark:bg-slate-800' : ''}"
+                                th:title="#{nav.menu}" aria-label="Menu" aria-expanded="false">
+                            <i class="fa-solid fa-bars text-base"></i>
+                        </button>
+
+                        <!-- Floating Popover Dropdown Menu -->
+                        <div id="menuDropdown"
+                             class="hidden absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-2xl py-2 z-50 transition-all duration-150 backdrop-blur-lg">
+                            
+                            <!-- Mobile-only Main Links (shown on screens < md) -->
+                            <div class="md:hidden pb-2 mb-2 border-b border-slate-200 dark:border-slate-800/80">
+                                <div class="px-3 py-1 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider" th:text="#{nav.main}">Main Navigation</div>
+                                <a th:href="@{/dashboard}" class="flex items-center px-3 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg mx-1 transition"
+                                   th:classappend="${currentNav == 'dashboard' ? 'text-amber-600 dark:text-amber-400 font-bold bg-slate-100 dark:bg-slate-800/60' : 'text-slate-700 dark:text-slate-300'}">
+                                    <i class="fa-solid fa-chart-pie mr-2.5 text-xs w-4 text-center"></i> <span th:text="#{nav.dashboard}">Dashboard</span>
+                                </a>
+                                <a th:href="@{/bills}" class="flex items-center px-3 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg mx-1 transition"
+                                   th:classappend="${currentNav == 'bills' ? 'text-amber-600 dark:text-amber-400 font-bold bg-slate-100 dark:bg-slate-800/60' : 'text-slate-700 dark:text-slate-300'}">
+                                    <i class="fa-solid fa-receipt mr-2.5 text-xs w-4 text-center"></i> <span th:text="#{nav.bills}">Bills & Proofs</span>
+                                </a>
+                                <a th:href="@{/bills/new}" class="flex items-center px-3 py-2 text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 rounded-lg mx-1 transition">
+                                    <i class="fa-solid fa-plus-circle mr-2.5 text-xs w-4 text-center"></i> <span th:text="#{nav.addBill}">Add / Scan Bill</span>
+                                </a>
+                                <a th:href="@{/recovery}" class="flex items-center px-3 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg mx-1 transition"
+                                   th:classappend="${currentNav == 'recovery' ? 'text-emerald-600 dark:text-emerald-400 font-bold bg-slate-100 dark:bg-slate-800/60' : 'text-slate-700 dark:text-slate-300'}">
+                                    <i class="fa-solid fa-shield-halved mr-2.5 text-xs w-4 text-center text-emerald-500"></i> <span th:text="#{nav.recovery}">Recovery Center</span>
+                                </a>
+                            </div>
+
+                            <!-- Menu Items: Accounts and Settings -->
+                            <div class="px-3 py-1 text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider" th:text="#{nav.menu}">Menu</div>
+                            <a th:href="@{/accounts}" class="flex items-center px-3 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg mx-1 transition"
+                               th:classappend="${currentNav == 'accounts' ? 'text-amber-600 dark:text-amber-400 font-bold bg-slate-100 dark:bg-slate-800/60' : 'text-slate-700 dark:text-slate-300'}">
+                                <i class="fa-solid fa-user-shield mr-2.5 text-xs w-4 text-center text-amber-500"></i> <span th:text="#{nav.accounts}">Accounts</span>
+                            </a>
+                            <a th:href="@{/settings}" class="flex items-center px-3 py-2 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg mx-1 transition"
+                               th:classappend="${currentNav == 'settings' ? 'text-amber-600 dark:text-amber-400 font-bold bg-slate-100 dark:bg-slate-800/60' : 'text-slate-700 dark:text-slate-300'}">
+                                <i class="fa-solid fa-sliders mr-2.5 text-xs w-4 text-center text-amber-500"></i> <span th:text="#{nav.settings}">Settings</span>
+                            </a>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
-        </div>
-
-        <!-- Mobile Drawer Menu -->
-        <div id="mobileDrawer" class="hidden lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0d1322]/95 backdrop-blur-md px-4 pt-3 pb-5 space-y-1">
-            <a th:href="@{/dashboard}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
-               th:classappend="${currentNav == 'dashboard' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <i class="fa-solid fa-chart-pie mr-2 text-xs"></i> <span th:text="#{nav.dashboard}">Dashboard</span>
-            </a>
-            <a th:href="@{/bills}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
-               th:classappend="${currentNav == 'bills' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <i class="fa-solid fa-receipt mr-2 text-xs"></i> <span th:text="#{nav.bills}">Bills & Proofs</span>
-            </a>
-            <a th:href="@{/bills/new}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition bg-amber-500/15 text-amber-600 dark:text-amber-300">
-                <i class="fa-solid fa-plus-circle mr-2 text-xs"></i> <span th:text="#{nav.addBill}">Add / Scan Bill</span>
-            </a>
-            <a th:href="@{/recovery}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
-               th:classappend="${currentNav == 'recovery' ? 'bg-slate-200 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <i class="fa-solid fa-shield-halved mr-2 text-xs text-emerald-500"></i> <span th:text="#{nav.recovery}">Recovery Center</span>
-            </a>
-            <a th:href="@{/accounts}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
-               th:classappend="${currentNav == 'accounts' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <i class="fa-solid fa-user-shield mr-2 text-xs"></i> <span th:text="#{nav.accounts}">Accounts</span>
-            </a>
-            <a th:href="@{/settings}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
-               th:classappend="${currentNav == 'settings' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <i class="fa-solid fa-sliders mr-2 text-xs"></i> <span th:text="#{nav.settings}">Settings</span>
-            </a>
         </div>
     </header>
 
@@ -338,11 +341,39 @@
         // Initialize icons on DOM ready
         document.addEventListener('DOMContentLoaded', syncThemeVisuals);
 
-        // 3. Mobile Navigation Drawer Toggle
-        function toggleMobileMenu() {
-            const drawer = document.getElementById('mobileDrawer');
-            if (drawer) drawer.classList.toggle('hidden');
+        // 3. Menu Dropdown Toggle & Event Handlers
+        function toggleMenuDropdown(e) {
+            if (e) e.stopPropagation();
+            const dropdown = document.getElementById('menuDropdown');
+            const btn = document.getElementById('menuBtn');
+            if (!dropdown) return;
+            const isHidden = dropdown.classList.toggle('hidden');
+            if (btn) btn.setAttribute('aria-expanded', !isHidden);
         }
+
+        // Close menu dropdown on outside click or Escape key
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('menuContainer');
+            const dropdown = document.getElementById('menuDropdown');
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                if (container && !container.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                    const btn = document.getElementById('menuBtn');
+                    if (btn) btn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const dropdown = document.getElementById('menuDropdown');
+                if (dropdown && !dropdown.classList.contains('hidden')) {
+                    dropdown.classList.add('hidden');
+                    const btn = document.getElementById('menuBtn');
+                    if (btn) btn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        });
 
         // 4. Lightbox modal
         function openLightbox(imageUrl, downloadUrl) {
