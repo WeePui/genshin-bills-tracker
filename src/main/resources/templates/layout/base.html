@@ -1,11 +1,30 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout (title, content)" lang="en" class="dark">
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout (title, content)" th:lang="${currentLang ?: 'en'}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" id="metaThemeColor" content="#0b0f19">
     <title th:replace="${title}">Genshin Bills Tracker</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" th:href="@{/images/logo.png}">
+
+    <!-- Synchronous Inline Theme Evaluation (Prevents FOUC) -->
+    <script>
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('theme');
+                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = storedTheme ? (storedTheme === 'dark') : (prefersDark !== false);
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -36,6 +55,7 @@
     <!-- Tesseract.js (Client-side OCR) -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script th:src="@{/js/scanner.js}"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         @font-face {
@@ -45,85 +65,201 @@
             font-style: normal;
             font-display: swap;
         }
+
+        :root {
+            --bg-body: #f8fafc;
+            --bg-header: rgba(255, 255, 255, 0.90);
+            --border-main: rgba(226, 232, 240, 0.9);
+            --bg-card: rgba(255, 255, 255, 0.92);
+            --bg-subcard: rgba(241, 245, 249, 0.92);
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border-card: #e2e8f0;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+            --overlay-gradient: linear-gradient(to bottom, rgba(248, 250, 252, 0.88), rgba(241, 245, 249, 0.97));
+        }
+
+        html.dark {
+            --bg-body: #0b0f19;
+            --bg-header: rgba(13, 19, 34, 0.88);
+            --border-main: rgba(30, 41, 59, 0.8);
+            --bg-card: #131b2e;
+            --bg-subcard: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-card: #1e293b;
+            --input-bg: #0f172a;
+            --input-border: #334155;
+            --overlay-gradient: linear-gradient(to bottom, rgba(11, 15, 25, 0.82), rgba(11, 15, 25, 0.94));
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0b0f19;
-            color: #e2e8f0;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
+
         h1, h2, h3, h4, .font-genshin {
             font-family: 'HYWenHei', 'Plus Jakarta Sans', sans-serif;
             letter-spacing: 0.02em;
         }
+
         .glow-gold {
             box-shadow: 0 0 15px rgba(236, 201, 75, 0.25);
         }
+
+        .theme-card {
+            background-color: var(--bg-card);
+            border-color: var(--border-card);
+            color: var(--text-primary);
+        }
+
+        .theme-subcard {
+            background-color: var(--bg-subcard);
+            border-color: var(--border-card);
+        }
+
+        .theme-input {
+            background-color: var(--input-bg);
+            border-color: var(--input-border);
+            color: var(--text-primary);
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col bg-[#0b0f19] text-slate-100 relative">
+<body class="min-h-screen flex flex-col relative transition-colors duration-200">
 
     <!-- Dynamic Genshin Impact Fullscreen Background -->
     <div th:if="${currentBackground != null && !currentBackground.empty}"
          class="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat bg-fixed transition-all duration-700 pointer-events-none"
-         th:style="'background-image: linear-gradient(to bottom, rgba(11, 15, 25, 0.82), rgba(11, 15, 25, 0.94)), url(' + @{'/images/' + ${currentBackground}} + ');'">
+         th:style="'background-image: var(--overlay-gradient), url(' + @{'/images/' + ${currentBackground}} + ');'">
     </div>
 
     <!-- Top Navigation Bar -->
-    <header class="border-b border-slate-800/80 bg-[#0d1322]/85 backdrop-blur-md sticky top-0 z-40">
+    <header class="border-b border-slate-200 dark:border-slate-800/80 bg-white/90 dark:bg-[#0d1322]/85 backdrop-blur-md sticky top-0 z-40 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
+
+                <!-- Logo & Brand -->
                 <div class="flex items-center space-x-3">
-                    <a th:href="@{/dashboard}" class="flex items-center space-x-2.5 text-amber-400 font-bold text-xl tracking-tight font-genshin">
+                    <a th:href="@{/dashboard}" class="flex items-center space-x-2.5 text-amber-500 dark:text-amber-400 font-bold text-xl tracking-tight font-genshin">
                         <img th:src="@{/images/logo.png}" alt="Logo" class="w-8 h-8 object-contain drop-shadow-md">
-                        <span>Genshin <span class="text-white">Bills Vault</span></span>
+                        <span>Genshin <span class="text-slate-900 dark:text-white">Bills Vault</span></span>
                     </a>
-                    <span class="text-xs px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20 font-medium">Recovery Ready</span>
+                    <span class="hidden sm:inline-block text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20 font-medium"
+                          th:text="#{app.subtitle}">Recovery Ready</span>
                 </div>
 
-                <nav class="hidden md:flex items-center space-x-1">
-                    <a th:href="@{/dashboard}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
-                       th:classappend="${currentNav == 'dashboard' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
-                        <i class="fa-solid fa-chart-pie mr-1.5 text-xs"></i> Dashboard
+                <!-- Desktop Navigation Links -->
+                <nav class="hidden lg:flex items-center space-x-1">
+                    <a th:href="@{/dashboard}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                       th:classappend="${currentNav == 'dashboard' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                        <i class="fa-solid fa-chart-pie mr-1.5 text-xs"></i> <span th:text="#{nav.dashboard}">Dashboard</span>
                     </a>
-                    <a th:href="@{/bills}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
-                       th:classappend="${currentNav == 'bills' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
-                        <i class="fa-solid fa-receipt mr-1.5 text-xs"></i> Bills & Proofs
+                    <a th:href="@{/bills}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                       th:classappend="${currentNav == 'bills' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                        <i class="fa-solid fa-receipt mr-1.5 text-xs"></i> <span th:text="#{nav.bills}">Bills & Proofs</span>
                     </a>
-                    <a th:href="@{/bills/new}" class="px-3 py-2 rounded-lg text-sm font-medium transition bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/30">
-                        <i class="fa-solid fa-plus-circle mr-1.5 text-xs"></i> Add / Scan Bill
+                    <a th:href="@{/bills/new}" class="px-3 py-2 rounded-lg text-sm font-medium transition bg-amber-500/15 text-amber-600 dark:text-amber-300 hover:bg-amber-500/25 border border-amber-500/30">
+                        <i class="fa-solid fa-plus-circle mr-1.5 text-xs"></i> <span th:text="#{nav.addBill}">Add / Scan Bill</span>
                     </a>
-                    <a th:href="@{/recovery}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
-                       th:classappend="${currentNav == 'recovery' ? 'bg-slate-800 text-emerald-400' : 'text-slate-300'}">
-                        <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-emerald-400"></i> Recovery Center
+                    <a th:href="@{/recovery}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                       th:classappend="${currentNav == 'recovery' ? 'bg-slate-200 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                        <i class="fa-solid fa-shield-halved mr-1.5 text-xs text-emerald-500 dark:text-emerald-400"></i> <span th:text="#{nav.recovery}">Recovery</span>
                     </a>
-                    <a th:href="@{/accounts}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
-                       th:classappend="${currentNav == 'accounts' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
-                        <i class="fa-solid fa-user-shield mr-1.5 text-xs"></i> Accounts
+                    <a th:href="@{/accounts}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                       th:classappend="${currentNav == 'accounts' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                        <i class="fa-solid fa-user-shield mr-1.5 text-xs"></i> <span th:text="#{nav.accounts}">Accounts</span>
                     </a>
-                    <a th:href="@{/settings}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-800 hover:text-white"
-                       th:classappend="${currentNav == 'settings' ? 'bg-slate-800 text-amber-400' : 'text-slate-300'}">
-                        <i class="fa-solid fa-sliders mr-1.5 text-xs"></i> Settings
+                    <a th:href="@{/settings}" class="px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white"
+                       th:classappend="${currentNav == 'settings' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-600 dark:text-slate-300'}">
+                        <i class="fa-solid fa-sliders mr-1.5 text-xs"></i> <span th:text="#{nav.settings}">Settings</span>
                     </a>
                 </nav>
+
+                <!-- Controls: Language Toggle & Theme Toggle -->
+                <div class="flex items-center space-x-2">
+
+                    <!-- Language Switcher Pill -->
+                    <div class="flex items-center border border-slate-300 dark:border-slate-700 rounded-lg p-0.5 bg-slate-100 dark:bg-slate-900 text-xs">
+                        <button type="button" onclick="switchLanguage('en')"
+                                class="px-2.5 py-1 rounded-md font-semibold transition"
+                                th:classappend="${currentLang == 'vi' ? 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white' : 'bg-white dark:bg-slate-800 text-amber-500 shadow-sm font-bold'}">
+                            EN
+                        </button>
+                        <button type="button" onclick="switchLanguage('vi')"
+                                class="px-2.5 py-1 rounded-md font-semibold transition"
+                                th:classappend="${currentLang == 'vi' ? 'bg-white dark:bg-slate-800 text-amber-500 shadow-sm font-bold' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'}">
+                            VI
+                        </button>
+                    </div>
+
+                    <!-- Theme Toggle Button -->
+                    <button type="button" onclick="toggleTheme()"
+                            class="p-2 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                            th:title="#{theme.toggle}" aria-label="Toggle Theme">
+                        <i class="fa-solid fa-moon theme-icon-moon text-sm"></i>
+                        <i class="fa-solid fa-sun theme-icon-sun text-sm text-amber-400 hidden"></i>
+                    </button>
+
+                    <!-- Mobile Hamburger Button -->
+                    <button type="button" onclick="toggleMobileMenu()" id="mobileMenuBtn"
+                            class="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                            aria-label="Open Navigation Menu">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+
             </div>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div id="mobileDrawer" class="hidden lg:hidden border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0d1322]/95 backdrop-blur-md px-4 pt-3 pb-5 space-y-1">
+            <a th:href="@{/dashboard}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
+               th:classappend="${currentNav == 'dashboard' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <i class="fa-solid fa-chart-pie mr-2 text-xs"></i> <span th:text="#{nav.dashboard}">Dashboard</span>
+            </a>
+            <a th:href="@{/bills}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
+               th:classappend="${currentNav == 'bills' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <i class="fa-solid fa-receipt mr-2 text-xs"></i> <span th:text="#{nav.bills}">Bills & Proofs</span>
+            </a>
+            <a th:href="@{/bills/new}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition bg-amber-500/15 text-amber-600 dark:text-amber-300">
+                <i class="fa-solid fa-plus-circle mr-2 text-xs"></i> <span th:text="#{nav.addBill}">Add / Scan Bill</span>
+            </a>
+            <a th:href="@{/recovery}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
+               th:classappend="${currentNav == 'recovery' ? 'bg-slate-200 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <i class="fa-solid fa-shield-halved mr-2 text-xs text-emerald-500"></i> <span th:text="#{nav.recovery}">Recovery Center</span>
+            </a>
+            <a th:href="@{/accounts}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
+               th:classappend="${currentNav == 'accounts' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <i class="fa-solid fa-user-shield mr-2 text-xs"></i> <span th:text="#{nav.accounts}">Accounts</span>
+            </a>
+            <a th:href="@{/settings}" class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
+               th:classappend="${currentNav == 'settings' ? 'bg-slate-200 dark:bg-slate-800 text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                <i class="fa-solid fa-sliders mr-2 text-xs"></i> <span th:text="#{nav.settings}">Settings</span>
+            </a>
         </div>
     </header>
 
     <!-- Flash Alerts -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 w-full">
-        <div th:if="${successMessage}" class="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 flex items-center justify-between mb-4">
+        <div th:if="${successMessage}" class="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 flex items-center justify-between mb-4 shadow-sm">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <i class="fa-solid fa-circle-check text-emerald-500 dark:text-emerald-400"></i>
                 <span th:text="${successMessage}">Success message</span>
             </div>
-            <button onclick="this.parentElement.remove()" class="text-emerald-400 hover:text-emerald-200"><i class="fa-solid fa-xmark"></i></button>
+            <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-200"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <div th:if="${errorMessage}" class="p-4 rounded-xl bg-rose-950/60 border border-rose-500/30 text-rose-300 flex items-center justify-between mb-4">
+        <div th:if="${errorMessage}" class="p-4 rounded-xl bg-rose-100 dark:bg-rose-950/60 border border-rose-500/30 text-rose-800 dark:text-rose-300 flex items-center justify-between mb-4 shadow-sm">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-circle-exclamation text-rose-400"></i>
+                <i class="fa-solid fa-circle-exclamation text-rose-500 dark:text-rose-400"></i>
                 <span th:text="${errorMessage}">Error message</span>
             </div>
-            <button onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-200"><i class="fa-solid fa-xmark"></i></button>
+            <button onclick="this.parentElement.remove()" class="text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-200"><i class="fa-solid fa-xmark"></i></button>
         </div>
     </div>
 
@@ -138,25 +274,77 @@
     <div id="imageLightbox" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="relative max-w-5xl w-full max-h-[90vh] flex flex-col items-center">
             <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-white hover:text-amber-400 text-2xl px-3 py-1">
-                <i class="fa-solid fa-xmark"></i> Close
+                <i class="fa-solid fa-xmark"></i> <span th:text="#{common.close}">Close</span>
             </button>
             <img id="lightboxImg" src="" alt="Receipt Image" class="max-h-[80vh] max-w-full rounded-lg shadow-2xl object-contain border border-slate-700">
             <div class="mt-3 flex items-center space-x-4">
                 <a id="lightboxDownloadBtn" href="#" download class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm border border-slate-600">
-                    <i class="fa-solid fa-download mr-1"></i> Download Original
+                    <i class="fa-solid fa-download mr-1"></i> <span th:text="#{common.viewOriginal}">Download Original</span>
                 </a>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800/80 bg-[#0d1322] py-6 mt-12 text-center text-xs text-slate-400">
+    <footer class="border-t border-slate-200 dark:border-slate-800/80 bg-white/70 dark:bg-[#0d1322] py-6 mt-12 text-center text-xs text-slate-500 dark:text-slate-400 transition-colors">
         <div class="max-w-7xl mx-auto px-4">
-            <p>Genshin Bills Tracker &bull; 100% Local, Offline-First &bull; Tailored for HoYoverse Account Recovery</p>
+            <p th:text="#{footer.text}">Genshin Bills Tracker &bull; 100% Local, Offline-First &bull; Tailored for HoYoverse Account Recovery</p>
         </div>
     </footer>
 
+    <!-- Core Runtime Scripts (Theme, Language, Lightbox, Mobile Nav) -->
     <script>
+        // 1. Language switcher helper (preserves URL query params)
+        function switchLanguage(lang) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('lang', lang);
+            window.location.href = url.toString();
+        }
+
+        // 2. Theme switcher helper (persists to localStorage + updates UI)
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            syncThemeVisuals();
+        }
+
+        function syncThemeVisuals() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const meta = document.getElementById('metaThemeColor');
+            if (meta) meta.content = isDark ? '#0b0f19' : '#f8fafc';
+
+            document.querySelectorAll('.theme-icon-sun').forEach(el => {
+                if (isDark) el.classList.remove('hidden'); else el.classList.add('hidden');
+            });
+            document.querySelectorAll('.theme-icon-moon').forEach(el => {
+                if (isDark) el.classList.add('hidden'); else el.classList.remove('hidden');
+            });
+        }
+
+        // React to OS-level theme changes if user hasn't explicitly set manual theme
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                if (!localStorage.getItem('theme')) {
+                    if (e.matches) {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                    syncThemeVisuals();
+                }
+            });
+        }
+
+        // Initialize icons on DOM ready
+        document.addEventListener('DOMContentLoaded', syncThemeVisuals);
+
+        // 3. Mobile Navigation Drawer Toggle
+        function toggleMobileMenu() {
+            const drawer = document.getElementById('mobileDrawer');
+            if (drawer) drawer.classList.toggle('hidden');
+        }
+
+        // 4. Lightbox modal
         function openLightbox(imageUrl, downloadUrl) {
             const modal = document.getElementById('imageLightbox');
             const img = document.getElementById('lightboxImg');

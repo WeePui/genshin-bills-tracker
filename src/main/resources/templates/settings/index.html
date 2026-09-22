@@ -1,107 +1,136 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::#content})}">
 <head>
-    <title>Application Settings & Vault Backup</title>
+    <title th:text="#{settings.title} + ' - ' + #{app.title}">Application Settings & Vault Backup</title>
 </head>
 <body>
 <div id="content" class="max-w-4xl mx-auto space-y-6">
 
     <!-- Header -->
-    <div class="border-b border-slate-800 pb-4">
-        <h1 class="text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
-            <i class="fa-solid fa-sliders text-amber-400"></i>
-            <span>Settings & Data Vault Backup</span>
+    <div class="border-b border-slate-200 dark:border-slate-800 pb-4">
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
+            <i class="fa-solid fa-sliders text-amber-500 dark:text-amber-400"></i>
+            <span th:text="#{settings.title}">Settings & Data Vault Backup</span>
         </h1>
-        <p class="text-sm text-slate-400 mt-1">Configure your default currencies, optional AI vision keys, and manage full offline data backups.</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1" th:text="#{settings.subtitle}">Configure your default currencies, wallpaper appearance, optional AI vision keys, and manage full offline data backups.</p>
     </div>
 
-    <!-- Currency & AI Configuration Form -->
+    <!-- Theme & Display Appearance Card -->
+    <div class="p-6 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md space-y-4 transition-colors">
+        <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-palette text-amber-500 dark:text-amber-400"></i>
+            <span th:text="#{settings.theme.title}">Display Theme & Appearance</span>
+        </h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400" th:text="#{settings.theme.desc}">Choose between Dark mode, Light mode, or follow your Operating System settings.</p>
+
+        <div class="grid grid-cols-3 gap-3 pt-1">
+            <button type="button" onclick="setThemePreference('system')" id="themeBtnSystem"
+                    class="p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 flex flex-col items-center justify-center space-y-2 hover:border-amber-400 transition text-center">
+                <i class="fa-solid fa-desktop text-lg text-indigo-500"></i>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200" th:text="#{theme.system}">System</span>
+            </button>
+
+            <button type="button" onclick="setThemePreference('light')" id="themeBtnLight"
+                    class="p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 flex flex-col items-center justify-center space-y-2 hover:border-amber-400 transition text-center">
+                <i class="fa-solid fa-sun text-lg text-amber-500"></i>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200" th:text="#{theme.light}">Light</span>
+            </button>
+
+            <button type="button" onclick="setThemePreference('dark')" id="themeBtnDark"
+                    class="p-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 flex flex-col items-center justify-center space-y-2 hover:border-amber-400 transition text-center">
+                <i class="fa-solid fa-moon text-lg text-indigo-400"></i>
+                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200" th:text="#{theme.dark}">Dark</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Currency & Wallpaper & AI Configuration Form -->
     <form th:action="@{/settings/save}" method="post" class="space-y-6">
-        <div class="p-6 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg space-y-5">
-            <h2 class="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center space-x-2">
-                <i class="fa-solid fa-coins text-amber-400"></i>
-                <span>Financial & Currency Preferences</span>
+        <div class="p-6 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md space-y-5 transition-colors">
+            <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center space-x-2">
+                <i class="fa-solid fa-coins text-amber-500 dark:text-amber-400"></i>
+                <span th:text="#{settings.currency.title}">Financial & Currency Preferences</span>
             </h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Base Currency for Totals</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1" th:text="#{settings.currency.base}">Base Currency for Totals</label>
                     <input type="text" th:field="${settings.baseCurrency}" required placeholder="USD" maxlength="6"
-                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 font-bold text-sm uppercase rounded-lg p-2.5 focus:ring-amber-500">
-                    <p class="text-[11px] text-slate-500 mt-1">All multi-currency bills will be converted to this base currency for totals and charts.</p>
+                           class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 font-bold text-sm uppercase rounded-lg p-2.5 focus:ring-amber-500">
+                    <p class="text-[11px] text-slate-500 mt-1" th:text="#{settings.currency.baseHint}">All multi-currency bills will be converted to this base currency for totals and charts.</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">USD to VND Exchange Rate</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1" th:text="#{settings.currency.vnd}">USD to VND Exchange Rate</label>
                     <input type="number" step="10" th:field="${settings.usdToVndRate}" placeholder="25400"
-                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500">
+                           class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500">
                     <p class="text-[11px] text-slate-500 mt-1">1 USD = X Vietnamese Dong</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">USD to EUR Exchange Rate</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1" th:text="#{settings.currency.eur}">USD to EUR Exchange Rate</label>
                     <input type="number" step="0.01" th:field="${settings.usdToEurRate}" placeholder="0.92"
-                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500">
+                           class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500">
                     <p class="text-[11px] text-slate-500 mt-1">1 USD = X Euro</p>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">USD to JPY Exchange Rate</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1" th:text="#{settings.currency.jpy}">USD to JPY Exchange Rate</label>
                     <input type="number" step="1" th:field="${settings.usdToJpyRate}" placeholder="155"
-                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500">
+                           class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500">
                     <p class="text-[11px] text-slate-500 mt-1">1 USD = X Japanese Yen</p>
                 </div>
             </div>
 
             <!-- Background Wallpaper Preferences -->
-            <div class="pt-4 border-t border-slate-800 space-y-4">
+            <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
                 <div class="flex items-center space-x-2">
-                    <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs">
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-500 dark:text-amber-400 flex items-center justify-center text-xs">
                         <i class="fa-solid fa-image"></i>
                     </div>
                     <div>
-                        <h3 class="text-xs font-bold text-white uppercase tracking-wider">Background Wallpaper Display</h3>
-                        <p class="text-xs text-slate-400">Choose whether the background rotates randomly between Genshin scenery artworks or stays fixed.</p>
+                        <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider" th:text="#{settings.bg.title}">Background Wallpaper Display</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" th:text="#{settings.bg.desc}">Choose whether the background rotates randomly between Genshin scenery artworks or stays fixed.</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <label id="modeRandomLabel" class="flex items-start p-4 rounded-xl border cursor-pointer transition"
-                           th:classappend="${settings.backgroundMode == 'STATIC' ? 'border-slate-700 bg-slate-900/60' : 'border-amber-500/60 bg-amber-500/10'}">
+                           th:classappend="${settings.backgroundMode == 'STATIC' ? 'border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/60' : 'border-amber-500 bg-amber-500/10'}">
                         <input type="radio" th:field="${settings.backgroundMode}" value="RANDOM" class="mt-1 text-amber-500 focus:ring-amber-500" onchange="toggleBackgroundPicker(this.value)">
                         <div class="ml-3">
-                            <span class="block text-sm font-bold text-white"><i class="fa-solid fa-shuffle text-amber-400 mr-1.5"></i> Dynamic Random (Default)</span>
-                            <span class="block text-xs text-slate-400 mt-1">Randomly chooses a new Genshin Impact landscape from 39 game wallpapers on each page load.</span>
+                            <span class="block text-sm font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-shuffle text-amber-500 dark:text-amber-400 mr-1.5"></i> <span th:text="#{settings.bg.randomTitle}">Dynamic Random (Default)</span></span>
+                            <span class="block text-xs text-slate-500 dark:text-slate-400 mt-1" th:text="#{settings.bg.randomDesc}">Randomly chooses a new Genshin Impact landscape from 39 game wallpapers on each page load.</span>
                         </div>
                     </label>
 
                     <label id="modeStaticLabel" class="flex items-start p-4 rounded-xl border cursor-pointer transition"
-                           th:classappend="${settings.backgroundMode == 'STATIC' ? 'border-amber-500/60 bg-amber-500/10' : 'border-slate-700 bg-slate-900/60'}">
+                           th:classappend="${settings.backgroundMode == 'STATIC' ? 'border-amber-500 bg-amber-500/10' : 'border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/60'}">
                         <input type="radio" th:field="${settings.backgroundMode}" value="STATIC" class="mt-1 text-amber-500 focus:ring-amber-500" onchange="toggleBackgroundPicker(this.value)">
                         <div class="ml-3">
-                            <span class="block text-sm font-bold text-white"><i class="fa-solid fa-image text-amber-400 mr-1.5"></i> Static Wallpaper</span>
-                            <span class="block text-xs text-slate-400 mt-1">Locks the application background to a single chosen Genshin Impact landscape artwork.</span>
+                            <span class="block text-sm font-bold text-slate-900 dark:text-white"><i class="fa-solid fa-image text-amber-500 dark:text-amber-400 mr-1.5"></i> <span th:text="#{settings.bg.staticTitle}">Static Wallpaper</span></span>
+                            <span class="block text-xs text-slate-500 dark:text-slate-400 mt-1" th:text="#{settings.bg.staticDesc}">Locks the application background to a single chosen Genshin Impact landscape artwork.</span>
                         </div>
                     </label>
                 </div>
 
                 <!-- Static Wallpaper Selection Grid -->
-                <div id="staticBackgroundPicker" class="pt-3 border-t border-slate-800 space-y-3" th:classappend="${settings.backgroundMode != 'STATIC' ? 'hidden' : ''}">
+                <div id="staticBackgroundPicker" class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-3" th:classappend="${settings.backgroundMode != 'STATIC' ? 'hidden' : ''}">
                     <div class="flex items-center justify-between">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Choose Static Wallpaper</label>
-                            <p class="text-xs text-slate-400">Click any artwork below to select it:</p>
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider" th:text="#{settings.bg.choose}">Choose Static Wallpaper</label>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Click any artwork below to select it:</p>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <span class="text-xs text-slate-400">Active Selection:</span>
-                            <span class="text-xs font-mono font-semibold text-amber-400 px-2.5 py-1 rounded bg-slate-900 border border-slate-700" id="selectedBgLabel" th:text="${settings.staticBackground ?: 'background_1.png'}">background_1.png</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400" th:text="#{settings.bg.active}">Active Selection:</span>
+                            <span class="text-xs font-mono font-semibold text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700" id="selectedBgLabel" th:text="${settings.staticBackground ?: 'background_1.png'}">background_1.png</span>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-80 overflow-y-auto p-2.5 bg-slate-950/80 rounded-xl border border-slate-800">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 max-h-80 overflow-y-auto p-2.5 bg-slate-100/80 dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-800">
                         <label th:each="bg : ${allBackgrounds}"
-                               class="relative group rounded-lg overflow-hidden border-2 cursor-pointer transition aspect-video flex items-end justify-center bg-slate-900 shadow-sm"
-                               th:classappend="${settings.staticBackground == bg ? 'border-amber-400 ring-2 ring-amber-400/50' : 'border-slate-800 hover:border-slate-600'}">
+                               class="relative group rounded-lg overflow-hidden border-2 cursor-pointer transition aspect-video flex items-end justify-center bg-slate-200 dark:bg-slate-900 shadow-sm"
+                               th:classappend="${settings.staticBackground == bg ? 'border-amber-400 ring-2 ring-amber-400/50' : 'border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600'}">
                             <input type="radio" th:field="${settings.staticBackground}" th:value="${bg}" class="sr-only" onchange="selectWallpaper(this)">
                             <img th:src="@{'/images/' + ${bg}}" alt="Wallpaper" loading="lazy" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-200">
                             <span class="relative z-10 w-full text-[10px] text-center font-mono py-0.5 bg-black/75 backdrop-blur-sm text-slate-200 truncate px-1" th:text="${bg}"></span>
@@ -111,31 +140,32 @@
             </div>
 
             <!-- AI Vision Scanner Option -->
-            <div class="pt-4 border-t border-slate-800 space-y-3">
+            <div class="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-3">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
-                        <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-xs">
+                        <div class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-500 dark:text-indigo-400 flex items-center justify-center text-xs">
                             <i class="fa-solid fa-brain"></i>
                         </div>
                         <div>
-                            <h3 class="text-xs font-bold text-white uppercase tracking-wider">Gemini Vision AI (Optional Enhancement)</h3>
-                            <p class="text-xs text-slate-400">Offline OCR is active by default. You can optionally add a Gemini API key for advanced multimodal vision.</p>
+                            <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider" th:text="#{settings.ai.title}">Gemini Vision AI (Optional Enhancement)</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400" th:text="#{settings.ai.desc}">Offline OCR is active by default. You can optionally add a Gemini API key for advanced multimodal vision.</p>
                         </div>
                     </div>
                     <span th:if="${settings.geminiApiKey != null && !settings.geminiApiKey.isBlank()}"
-                          class="px-2 py-0.5 rounded text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Configured</span>
+                          class="px-2 py-0.5 rounded text-[11px] bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 font-medium" th:text="#{settings.ai.configured}">Configured</span>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Google Gemini API Key</label>
+                    <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1" th:text="#{settings.ai.apiKey}">Google Gemini API Key</label>
                     <input type="password" th:field="${settings.geminiApiKey}" placeholder="AIzaSy..."
-                           class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 font-mono">
-                    <p class="text-[11px] text-slate-500 mt-1">Leave blank to use 100% offline client-side OCR only.</p>
+                           class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg p-2.5 focus:ring-amber-500 font-mono">
+                    <p class="text-[11px] text-slate-500 mt-1" th:text="#{settings.ai.apiKeyHint}">Leave blank to use 100% offline client-side OCR only.</p>
                 </div>
             </div>
 
             <div class="pt-2 flex justify-end">
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow transition">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-md transition"
+                        th:text="#{settings.save}">
                     Save Preferences
                 </button>
             </div>
@@ -143,48 +173,49 @@
     </form>
 
     <!-- Full Vault Backup & Restore Section -->
-    <div class="p-6 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg space-y-5">
-        <h2 class="text-sm font-bold text-white uppercase tracking-wider border-b border-slate-800 pb-2 flex items-center space-x-2">
-            <i class="fa-solid fa-box-archive text-emerald-400"></i>
-            <span>Vault Backup & Disaster Recovery</span>
+    <div class="p-6 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md space-y-5 transition-colors">
+        <h2 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-200 dark:border-slate-800 pb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-box-archive text-emerald-500 dark:text-emerald-400"></i>
+            <span th:text="#{settings.backup.title}">Vault Backup & Disaster Recovery</span>
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Backup Card -->
-            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
                 <div>
-                    <h3 class="text-sm font-bold text-white flex items-center space-x-2">
-                        <i class="fa-solid fa-file-zipper text-emerald-400"></i>
-                        <span>Download Full Vault Backup</span>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-file-zipper text-emerald-500 dark:text-emerald-400"></i>
+                        <span th:text="#{settings.backup.downloadTitle}">Download Full Vault Backup</span>
                     </h3>
-                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed" th:text="#{settings.backup.downloadDesc}">
                         Bundles your entire database (all accounts, purchase records, settings) and all physical receipt screenshot files into a standalone compressed `.zip` archive.
                     </p>
                 </div>
                 <div class="pt-2">
                     <a th:href="@{/settings/backup/download}" class="w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-download"></i>
-                        <span>Export Backup Archive (.ZIP)</span>
+                        <span th:text="#{settings.backup.downloadBtn}">Export Backup Archive (.ZIP)</span>
                     </a>
                 </div>
             </div>
 
             <!-- Restore Card -->
-            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-3 flex flex-col justify-between">
                 <div>
-                    <h3 class="text-sm font-bold text-white flex items-center space-x-2">
-                        <i class="fa-solid fa-upload text-amber-400"></i>
-                        <span>Restore Vault from Backup</span>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-upload text-amber-500 dark:text-amber-400"></i>
+                        <span th:text="#{settings.backup.restoreTitle}">Restore Vault from Backup</span>
                     </h3>
-                    <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed" th:text="#{settings.backup.restoreDesc}">
                         Restore your receipt files from a previously downloaded `.zip` backup package.
                     </p>
                 </div>
                 <form th:action="@{/settings/backup/restore}" method="post" enctype="multipart/form-data" class="pt-2 space-y-2">
                     <input type="file" name="backupFile" accept=".zip" required
-                           class="block w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-amber-400 hover:file:bg-slate-700">
-                    <button type="submit" onclick="return confirm('Restore receipt files from this backup?');"
-                            class="w-full py-2 px-4 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-xl text-xs font-semibold border border-slate-700 transition">
+                           class="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-200 dark:file:bg-slate-800 file:text-amber-600 dark:file:text-amber-400 hover:file:bg-slate-300 dark:hover:file:bg-slate-700">
+                    <button type="submit" th:onclick="'return confirm(\'' + #{settings.backup.restoreConfirm} + '\');'"
+                            class="w-full py-2 px-4 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-amber-400 rounded-xl text-xs font-semibold border border-slate-300 dark:border-slate-700 transition"
+                            th:text="#{settings.backup.restoreBtn}">
                         Restore Backup File
                     </button>
                 </form>
@@ -192,7 +223,7 @@
         </div>
     </div>
 
-    <!-- Interactive Background Scripts -->
+    <!-- Interactive Settings & Theme Scripts -->
     <script>
         function toggleBackgroundPicker(mode) {
             const picker = document.getElementById('staticBackgroundPicker');
@@ -201,34 +232,82 @@
 
             if (mode === 'STATIC') {
                 picker.classList.remove('hidden');
-                staticLabel.classList.add('border-amber-500/60', 'bg-amber-500/10');
-                staticLabel.classList.remove('border-slate-700', 'bg-slate-900/60');
-                randomLabel.classList.remove('border-amber-500/60', 'bg-amber-500/10');
-                randomLabel.classList.add('border-slate-700', 'bg-slate-900/60');
+                staticLabel.classList.add('border-amber-500', 'bg-amber-500/10');
+                staticLabel.classList.remove('border-slate-300', 'dark:border-slate-700', 'bg-slate-50/80', 'dark:bg-slate-900/60');
+                randomLabel.classList.remove('border-amber-500', 'bg-amber-500/10');
+                randomLabel.classList.add('border-slate-300', 'dark:border-slate-700', 'bg-slate-50/80', 'dark:bg-slate-900/60');
             } else {
                 picker.classList.add('hidden');
-                randomLabel.classList.add('border-amber-500/60', 'bg-amber-500/10');
-                randomLabel.classList.remove('border-slate-700', 'bg-slate-900/60');
-                staticLabel.classList.remove('border-amber-500/60', 'bg-amber-500/10');
-                staticLabel.classList.add('border-slate-700', 'bg-slate-900/60');
+                randomLabel.classList.add('border-amber-500', 'bg-amber-500/10');
+                randomLabel.classList.remove('border-slate-300', 'dark:border-slate-700', 'bg-slate-50/80', 'dark:bg-slate-900/60');
+                staticLabel.classList.remove('border-amber-500', 'bg-amber-500/10');
+                staticLabel.classList.add('border-slate-300', 'dark:border-slate-700', 'bg-slate-50/80', 'dark:bg-slate-900/60');
             }
         }
 
         function selectWallpaper(radio) {
             document.querySelectorAll('#staticBackgroundPicker label').forEach(lbl => {
                 lbl.classList.remove('border-amber-400', 'ring-2', 'ring-amber-400/50');
-                lbl.classList.add('border-slate-800');
+                lbl.classList.add('border-slate-300', 'dark:border-slate-800');
             });
             const label = radio.closest('label');
             if (label) {
                 label.classList.add('border-amber-400', 'ring-2', 'ring-amber-400/50');
-                label.classList.remove('border-slate-800');
+                label.classList.remove('border-slate-300', 'dark:border-slate-800');
             }
             const labelDisplay = document.getElementById('selectedBgLabel');
             if (labelDisplay) {
                 labelDisplay.textContent = radio.value;
             }
         }
+
+        // Theme Preference buttons in Settings
+        function setThemePreference(pref) {
+            if (pref === 'system') {
+                localStorage.removeItem('theme');
+                const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (isDark) document.documentElement.classList.add('dark');
+                else document.documentElement.classList.remove('dark');
+            } else if (pref === 'light') {
+                localStorage.setItem('theme', 'light');
+                document.documentElement.classList.remove('dark');
+            } else if (pref === 'dark') {
+                localStorage.setItem('theme', 'dark');
+                document.documentElement.classList.add('dark');
+            }
+            updateSettingsThemeButtons();
+            if (typeof syncThemeVisuals === 'function') syncThemeVisuals();
+        }
+
+        function updateSettingsThemeButtons() {
+            const stored = localStorage.getItem('theme'); // null = system, 'light', 'dark'
+            const activeClass = ['border-amber-500', 'ring-2', 'ring-amber-400/40', 'bg-amber-500/10'];
+            const inactiveClass = ['border-slate-300', 'dark:border-slate-700', 'bg-slate-50', 'dark:bg-slate-900/60'];
+
+            const btnSys = document.getElementById('themeBtnSystem');
+            const btnLight = document.getElementById('themeBtnLight');
+            const btnDark = document.getElementById('themeBtnDark');
+
+            [btnSys, btnLight, btnDark].forEach(btn => {
+                if (btn) {
+                    btn.classList.remove(...activeClass);
+                    btn.classList.add(...inactiveClass);
+                }
+            });
+
+            if (!stored && btnSys) {
+                btnSys.classList.add(...activeClass);
+                btnSys.classList.remove(...inactiveClass);
+            } else if (stored === 'light' && btnLight) {
+                btnLight.classList.add(...activeClass);
+                btnLight.classList.remove(...inactiveClass);
+            } else if (stored === 'dark' && btnDark) {
+                btnDark.classList.add(...activeClass);
+                btnDark.classList.remove(...inactiveClass);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateSettingsThemeButtons);
     </script>
 </div>
 </body>

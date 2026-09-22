@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::#content})}">
 <head>
-    <title>Spending Dashboard - Genshin Bills Tracker</title>
+    <title th:text="#{dashboard.title} + ' - ' + #{app.title}">Spending Dashboard - Genshin Bills Tracker</title>
 </head>
 <body>
 <div id="content" class="space-y-6">
@@ -9,18 +9,18 @@
     <!-- Top Header and Account Selector -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
-                <span>Spending & Recovery Dashboard</span>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center space-x-2">
+                <span th:text="#{dashboard.title}">Spending & Recovery Dashboard</span>
             </h1>
-            <p class="text-sm text-slate-400 mt-1">Track your total financial investment and safeguard your account recovery evidence.</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1" th:text="#{dashboard.subtitle}">Track your total financial investment and safeguard your account recovery evidence.</p>
         </div>
 
-        <div class="flex items-center space-x-3">
+        <div class="flex flex-wrap items-center gap-3">
             <form th:action="@{/dashboard}" method="get" class="flex items-center space-x-2">
-                <label for="accountSelect" class="text-xs font-medium text-slate-400">Account:</label>
+                <label for="accountSelect" class="text-xs font-medium text-slate-500 dark:text-slate-400" th:text="#{dashboard.stat.activeAccount}">Account:</label>
                 <select id="accountSelect" name="accountId" onchange="this.form.submit()"
-                        class="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2 focus:ring-amber-500 focus:border-amber-500">
-                    <option value="" th:selected="${selectedAccountId == null}">All Accounts (Combined)</option>
+                        class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:ring-amber-500 focus:border-amber-500">
+                    <option value="" th:selected="${selectedAccountId == null}" th:text="#{bills.filter.allAccounts}">All Accounts (Combined)</option>
                     <option th:each="acc : ${accounts}"
                             th:value="${acc.id}"
                             th:text="${acc.nickname + ' (' + acc.uid + ')'}"
@@ -29,7 +29,7 @@
             </form>
             <a th:href="@{/bills/new}" class="px-3.5 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-sm shadow flex items-center space-x-1.5 transition">
                 <i class="fa-solid fa-plus text-xs"></i>
-                <span>Add Bill</span>
+                <span th:text="#{dashboard.quickBill}">Add Bill</span>
             </a>
         </div>
     </div>
@@ -37,56 +37,56 @@
     <!-- Summary Statistics Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1: Total Spend -->
-        <div class="p-5 rounded-2xl bg-gradient-to-br from-[#131b2e] to-[#0f172a] border border-slate-800 shadow-lg relative overflow-hidden">
-            <div class="absolute -right-4 -bottom-4 opacity-10 text-amber-400 text-8xl">
+        <div class="p-5 rounded-2xl bg-white/90 dark:bg-gradient-to-br dark:from-[#131b2e] dark:to-[#0f172a] border border-slate-200 dark:border-slate-800 shadow-md relative overflow-hidden transition-colors">
+            <div class="absolute -right-4 -bottom-4 opacity-10 text-amber-500 dark:text-amber-400 text-8xl pointer-events-none">
                 <i class="fa-solid fa-wallet"></i>
             </div>
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Lifetime Total Spend</div>
-            <div class="text-3xl font-extrabold text-amber-400 mt-2 flex items-baseline space-x-1">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" th:text="#{dashboard.stat.lifetime}">Lifetime Total Spend</div>
+            <div class="text-3xl font-extrabold text-amber-500 dark:text-amber-400 mt-2 flex items-baseline space-x-1">
                 <span th:text="${#numbers.formatDecimal(summary.totalSpend, 1, 2)}">0.00</span>
-                <span class="text-sm font-semibold text-slate-400 ml-1" th:text="${summary.baseCurrency}">USD</span>
+                <span class="text-sm font-semibold text-slate-500 dark:text-slate-400 ml-1" th:text="${summary.baseCurrency}">USD</span>
             </div>
-            <div class="text-xs text-slate-400 mt-2 flex items-center space-x-1">
-                <i class="fa-solid fa-receipt text-slate-500"></i>
-                <span th:text="${summary.totalBillsCount + ' recorded transactions'}">0 transactions</span>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center space-x-1">
+                <i class="fa-solid fa-receipt text-slate-400 dark:text-slate-500"></i>
+                <span th:text="${summary.totalBillsCount + ' ' + #messages.msg('dashboard.recent.title')}">0 transactions</span>
             </div>
         </div>
 
         <!-- Card 2: This Month -->
-        <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg relative overflow-hidden">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Current Month Spend</div>
-            <div class="text-3xl font-extrabold text-white mt-2 flex items-baseline space-x-1">
+        <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md relative overflow-hidden transition-colors">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" th:text="#{dashboard.stat.currentMonth}">Current Month Spend</div>
+            <div class="text-3xl font-extrabold text-slate-900 dark:text-white mt-2 flex items-baseline space-x-1">
                 <span th:text="${#numbers.formatDecimal(summary.thisMonthSpend, 1, 2)}">0.00</span>
-                <span class="text-sm font-semibold text-slate-400 ml-1" th:text="${summary.baseCurrency}">USD</span>
+                <span class="text-sm font-semibold text-slate-500 dark:text-slate-400 ml-1" th:text="${summary.baseCurrency}">USD</span>
             </div>
-            <div class="text-xs text-emerald-400 mt-2 flex items-center space-x-1">
+            <div class="text-xs text-emerald-600 dark:text-emerald-400 mt-2 flex items-center space-x-1 font-medium">
                 <i class="fa-regular fa-calendar-check"></i>
                 <span>Active 30-day window</span>
             </div>
         </div>
 
         <!-- Card 3: Welkin Moons -->
-        <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg relative overflow-hidden">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Welkin Moons</div>
-            <div class="text-3xl font-extrabold text-amber-300 mt-2 flex items-baseline space-x-2">
+        <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md relative overflow-hidden transition-colors">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" th:text="#{dashboard.stat.welkinCount}">Welkin Moons</div>
+            <div class="text-3xl font-extrabold text-amber-500 dark:text-amber-300 mt-2 flex items-baseline space-x-2">
                 <span th:text="${summary.welkinCount}">0</span>
-                <span class="text-xs font-normal text-slate-400">purchased</span>
+                <span class="text-xs font-normal text-slate-500 dark:text-slate-400">active</span>
             </div>
-            <div class="text-xs text-slate-400 mt-2 flex items-center space-x-1">
-                <i class="fa-solid fa-moon text-amber-400/80"></i>
-                <span th:text="${(summary.welkinCount * 30) + ' total days of Welkin'}">0 days</span>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center space-x-1">
+                <i class="fa-solid fa-moon text-amber-500 dark:text-amber-400/80"></i>
+                <span th:text="${(summary.welkinCount * 30) + ' total days'}">0 days</span>
             </div>
         </div>
 
         <!-- Card 4: Battle Passes -->
-        <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg relative overflow-hidden">
-            <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Battle Passes</div>
-            <div class="text-3xl font-extrabold text-indigo-400 mt-2 flex items-baseline space-x-2">
+        <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md relative overflow-hidden transition-colors">
+            <div class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider" th:text="#{dashboard.stat.battlePassCount}">Battle Passes</div>
+            <div class="text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-2 flex items-baseline space-x-2">
                 <span th:text="${summary.battlePassCount}">0</span>
-                <span class="text-xs font-normal text-slate-400">seasons</span>
+                <span class="text-xs font-normal text-slate-500 dark:text-slate-400">seasons</span>
             </div>
-            <div class="text-xs text-slate-400 mt-2 flex items-center space-x-1">
-                <i class="fa-solid fa-award text-indigo-400"></i>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-2 flex items-center space-x-1">
+                <i class="fa-solid fa-award text-indigo-500 dark:text-indigo-400"></i>
                 <span>Gnostic Hymn / Chorus</span>
             </div>
         </div>
@@ -95,13 +95,13 @@
     <!-- Charts Row -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Monthly Spending Trend (2 cols) -->
-        <div class="lg:col-span-2 p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg flex flex-col justify-between">
+        <div class="lg:col-span-2 p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md flex flex-col justify-between transition-colors">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-base font-semibold text-white flex items-center space-x-2">
-                    <i class="fa-solid fa-chart-column text-amber-400"></i>
-                    <span>Monthly Spending Trend</span>
+                <h3 class="text-base font-semibold text-slate-900 dark:text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-column text-amber-500 dark:text-amber-400"></i>
+                    <span th:text="#{dashboard.chart.monthly}">Monthly Spending Trend</span>
                 </h3>
-                <span class="text-xs text-slate-400" th:text="'Currency: ' + ${summary.baseCurrency}">USD</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400" th:text="'Currency: ' + ${summary.baseCurrency}">USD</span>
             </div>
             <div class="h-64 relative">
                 <canvas id="monthlyChart"></canvas>
@@ -109,11 +109,11 @@
         </div>
 
         <!-- Category Distribution (1 col) -->
-        <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg flex flex-col justify-between">
+        <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md flex flex-col justify-between transition-colors">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-base font-semibold text-white flex items-center space-x-2">
-                    <i class="fa-solid fa-chart-pie text-indigo-400"></i>
-                    <span>Item Distribution</span>
+                <h3 class="text-base font-semibold text-slate-900 dark:text-white flex items-center space-x-2">
+                    <i class="fa-solid fa-chart-pie text-indigo-500 dark:text-indigo-400"></i>
+                    <span th:text="#{dashboard.chart.distribution}">Spending by Category</span>
                 </h3>
             </div>
             <div class="h-64 relative flex items-center justify-center">
@@ -123,55 +123,58 @@
     </div>
 
     <!-- Recent Bills Table & Quick Actions -->
-    <div class="p-5 rounded-2xl bg-[#131b2e] border border-slate-800 shadow-lg">
+    <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#131b2e] border border-slate-200 dark:border-slate-800 shadow-md transition-colors">
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center space-x-2">
-                <i class="fa-solid fa-receipt text-amber-400"></i>
-                <h3 class="text-base font-semibold text-white">Recent Transactions & Evidence</h3>
+                <i class="fa-solid fa-receipt text-amber-500 dark:text-amber-400"></i>
+                <h3 class="text-base font-semibold text-slate-900 dark:text-white" th:text="#{dashboard.recent.title}">Recent Purchase Transactions</h3>
             </div>
-            <a th:href="@{/bills}" class="text-xs text-amber-400 hover:text-amber-300 font-medium">View All Bills &rarr;</a>
+            <a th:href="@{/bills}" class="text-xs text-amber-600 dark:text-amber-400 hover:underline font-medium" th:text="#{dashboard.recent.viewAll} + ' &rarr;'">View All Bills &rarr;</a>
         </div>
 
         <div th:if="${recentBills.empty}" class="text-center py-10 text-slate-500">
             <i class="fa-solid fa-receipt text-4xl mb-3 opacity-30"></i>
-            <p>No transactions recorded yet.</p>
-            <a th:href="@{/bills/new}" class="mt-3 inline-block px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-semibold">
-                Add Your First Bill or Scan an Invoice
+            <p th:text="#{dashboard.empty.title}">No purchase bills yet</p>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto" th:text="#{dashboard.empty.desc}">Add your first bill or scan an invoice screenshot.</p>
+            <a th:href="@{/bills/new}" class="mt-3 inline-block px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-xs font-semibold"
+               th:text="#{dashboard.empty.action}">
+                Add First Bill
             </a>
         </div>
 
         <div th:unless="${recentBills.empty}" class="overflow-x-auto">
-            <table class="w-full text-left text-sm text-slate-300">
-                <thead class="text-xs uppercase bg-slate-900/60 text-slate-400 border-b border-slate-800">
+            <table class="w-full text-left text-sm text-slate-700 dark:text-slate-300">
+                <thead class="text-xs uppercase bg-slate-100 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                     <tr>
-                        <th class="py-3 px-4">Date</th>
-                        <th class="py-3 px-4">Account</th>
-                        <th class="py-3 px-4">Item</th>
-                        <th class="py-3 px-4">Platform</th>
-                        <th class="py-3 px-4">Order ID</th>
-                        <th class="py-3 px-4">Amount</th>
-                        <th class="py-3 px-4">Receipt</th>
-                        <th class="py-3 px-4 text-right">Actions</th>
+                        <th class="py-3 px-4" th:text="#{bills.col.date}">Date</th>
+                        <th class="py-3 px-4" th:text="#{bills.col.account}">Account</th>
+                        <th class="py-3 px-4" th:text="#{bills.col.item}">Item</th>
+                        <th class="py-3 px-4" th:text="#{bills.col.platform}">Platform</th>
+                        <th class="py-3 px-4" th:text="#{bills.col.orderId}">Order ID</th>
+                        <th class="py-3 px-4" th:text="#{bills.col.amount}">Amount</th>
+                        <th class="py-3 px-4" th:text="#{bills.col.proof}">Receipt</th>
+                        <th class="py-3 px-4 text-right" th:text="#{bills.col.actions}">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800">
-                    <tr th:each="bill : ${recentBills}" class="hover:bg-slate-800/40 transition">
-                        <td class="py-3 px-4 font-mono text-xs text-slate-400" th:text="${#temporals.format(bill.purchaseDate, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                    <tr th:each="bill : ${recentBills}" class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                        <td class="py-3 px-4 font-mono text-xs text-slate-500 dark:text-slate-400" th:text="${#temporals.format(bill.purchaseDate, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
                         <td class="py-3 px-4">
-                            <span class="font-medium text-white" th:text="${bill.account.nickname}">Nickname</span>
-                            <span class="text-xs text-slate-400 block font-mono" th:text="${bill.account.uid}">UID</span>
+                            <span class="font-medium text-slate-900 dark:text-white" th:text="${bill.account.nickname}">Nickname</span>
+                            <span class="text-xs text-slate-400 dark:text-slate-500 block font-mono" th:text="${bill.account.uid}">UID</span>
                         </td>
                         <td class="py-3 px-4">
-                            <span class="font-medium text-amber-300" th:text="${bill.displayItemName}">Welkin Moon</span>
-                            <span th:if="${bill.firstPurchase}" class="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30">1st Purchase</span>
+                            <span class="font-medium text-amber-600 dark:text-amber-300" th:text="${bill.displayItemName}">Welkin Moon</span>
+                            <span th:if="${bill.firstPurchase}" class="ml-1 px-1.5 py-0.5 rounded text-[10px] bg-rose-500/15 text-rose-600 dark:text-rose-300 border border-rose-500/30"
+                                  th:text="#{bills.firstPurchase.badge}">1st Purchase</span>
                         </td>
-                        <td class="py-3 px-4 text-xs text-slate-300" th:text="${bill.platform.displayName}">Google Play</td>
-                        <td class="py-3 px-4 font-mono text-xs text-slate-300">
+                        <td class="py-3 px-4 text-xs text-slate-600 dark:text-slate-300" th:text="${bill.platform.displayName}">Google Play</td>
+                        <td class="py-3 px-4 font-mono text-xs text-slate-600 dark:text-slate-300">
                             <span th:if="${bill.orderId != null}" th:text="${bill.orderId}">GPA.1234</span>
-                            <span th:if="${bill.orderId == null}" class="text-slate-600">None</span>
+                            <span th:if="${bill.orderId == null}" class="text-slate-400 dark:text-slate-600">None</span>
                         </td>
-                        <td class="py-3 px-4 font-bold text-white">
-                            <span th:text="${bill.amount}">4.99</span> <span class="text-xs text-slate-400" th:text="${bill.currency}">USD</span>
+                        <td class="py-3 px-4 font-bold text-slate-900 dark:text-white">
+                            <span th:text="${bill.amount}">4.99</span> <span class="text-xs text-slate-500 dark:text-slate-400" th:text="${bill.currency}">USD</span>
                         </td>
                         <td class="py-3 px-4">
                             <div th:if="${!bill.attachments.empty}" class="flex items-center space-x-1">
@@ -179,16 +182,16 @@
                                         th:data-view="@{'/attachments/' + ${att.storedFileName}}"
                                         th:data-download="@{'/attachments/' + ${att.storedFileName} + '/download'}"
                                         onclick="openLightbox(this.dataset.view, this.dataset.download)"
-                                        class="w-7 h-7 rounded border border-slate-700 bg-slate-900 overflow-hidden hover:border-amber-400 transition"
+                                        class="w-7 h-7 rounded border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 overflow-hidden hover:border-amber-400 transition"
                                         title="Click to view full receipt">
                                     <img th:src="@{'/attachments/' + ${att.storedFileName}}" alt="Receipt thumbnail" class="w-full h-full object-cover">
                                 </button>
                             </div>
-                            <span th:if="${bill.attachments.empty}" class="text-xs text-slate-600 italic">No proof</span>
+                            <span th:if="${bill.attachments.empty}" class="text-xs text-slate-400 dark:text-slate-600 italic" th:text="#{bills.proof.none}">No proof</span>
                         </td>
                         <td class="py-3 px-4 text-right">
-                            <a th:href="@{'/bills/' + ${bill.id}}" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs rounded border border-slate-700 transition">
-                                Details
+                            <a th:href="@{'/bills/' + ${bill.id}}" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-400 text-xs font-semibold rounded border border-slate-300 dark:border-slate-700 transition">
+                                <i class="fa-solid fa-eye mr-1"></i> <span th:text="#{common.edit}">Details</span>
                             </a>
                         </td>
                     </tr>
@@ -210,6 +213,10 @@
         const categoryValues = /*[[${summary.categoryValues}]]*/ [];
         /*]]>*/
 
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+
         // 1. Monthly Chart
         const ctxMonthly = document.getElementById('monthlyChart')?.getContext('2d');
         if (ctxMonthly) {
@@ -220,7 +227,7 @@
                     datasets: [{
                         label: 'Spending',
                         data: monthlyValues.length > 0 ? monthlyValues : [0],
-                        backgroundColor: 'rgba(236, 201, 75, 0.7)',
+                        backgroundColor: 'rgba(236, 201, 75, 0.75)',
                         borderColor: '#ecc94b',
                         borderWidth: 1.5,
                         borderRadius: 6
@@ -232,12 +239,12 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            ticks: { color: '#94a3b8' }
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#94a3b8' }
+                            ticks: { color: textColor }
                         }
                     },
                     plugins: {
@@ -261,7 +268,7 @@
                             '#8b5cf6', '#06b6d4', '#f97316', '#a855f7'
                         ],
                         borderWidth: 2,
-                        borderColor: '#131b2e'
+                        borderColor: isDark ? '#131b2e' : '#ffffff'
                     }]
                 },
                 options: {
@@ -270,7 +277,7 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: { color: '#cbd5e1', boxWidth: 12, font: { size: 11 } }
+                            labels: { color: textColor, boxWidth: 12, font: { size: 11 } }
                         }
                     }
                 }

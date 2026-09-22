@@ -149,4 +149,28 @@ class WebMvcTemplateRenderTest {
         AppSettings settings = settingsRepository.findById(1L).orElseThrow();
         assertEquals("RANDOM", settings.getBackgroundMode());
     }
+
+    @Test
+    void testVietnameseLocaleRendering() throws Exception {
+        mockMvc.perform(get("/dashboard?lang=vi"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testEnglishLocaleRendering() throws Exception {
+        mockMvc.perform(get("/dashboard?lang=en"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testI18nApiEndpointVietnamese() throws Exception {
+        mockMvc.perform(get("/api/i18n/vi"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testI18nApiEndpointEnglish() throws Exception {
+        mockMvc.perform(get("/api/i18n/en"))
+                .andExpect(status().isOk());
+    }
 }
